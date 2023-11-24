@@ -7,9 +7,9 @@ function TabContainer(props) {
         <>
             <Stack direction="row">
                 <Tabs value={selected} onChange={handleTabChange}>
-                    { tabOptions.map((option) => (
+                    { tabOptions.map((option, index) => (
                         <Tab 
-                            key={option.value} 
+                            key={index} 
                             label={option.name[0].toUpperCase() + option.name.slice(1)}
                             id={option.name + '-tab'} 
                             aria-controls={option.name + "-tabpanel"} 

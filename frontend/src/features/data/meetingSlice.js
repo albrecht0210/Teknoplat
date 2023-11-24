@@ -5,7 +5,7 @@ export const meetingSlice = createSlice({
     initialState: {
         meetings: [],
         meeting: null,
-        status: 1,
+        status: "in_progress",
     },
     reducers: {
         storeMeetings: (state, { payload }) => {

@@ -6,6 +6,7 @@ import DrawerLayout from "./layouts/DrawerLayout";
 import LoginPage from "./features/login/LoginPage";
 import DashboardPage from "./features/dashboard/DashboardPage";
 import CoursePage from "./features/course/CoursePage";
+import CourseLayout from "./layouts/CourseLayout";
 
 const { createBrowserRouter, RouterProvider } = require("react-router-dom");
 
@@ -24,19 +25,23 @@ function UrlPaths() {
                         {
                             path: "",
                             element: <DashboardPage />
+                        },
+                        {
+                            path: ":course",
+                            element: <CoursePage />,
                         }
+                        // {
+                        //     path: "courses/",
+                        //     element: <CourseLayout />,
+                        //     children: [
+                        //         {
+                        //             path: ":course",
+                        //             element: <CoursePage />,
+                        //         }
+                        //     ]
+                        // }
                     ]
                 },
-                {
-                    path: ":course",
-                    element: <CoursePage />,
-                    // children: [
-                    //     {
-                    //         path: ":meeting",
-                    //         element: <MeetingPage />
-                    //     }
-                    // ]
-                }
             ]
         }
     ];

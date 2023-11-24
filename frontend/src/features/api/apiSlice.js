@@ -41,7 +41,10 @@ export const apiSlice = createApi({
         }),
 
         // Teknoplat Server
-        getMeetings: builder.query({
+        getMeetingsByCourse: builder.query({
+            query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}/`
+        }),
+        getMeetingsByCourseAndStatus: builder.query({
             query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}&state=${payload.status}/`
         }),
         getMeeting: builder.query({
@@ -61,6 +64,7 @@ export const {
     useGetCourseDetailQuery,
 
     // Teknoplat Server
-    useGetMeetingsQuery,
+    useGetMeetingsByCourseQuery,
+    useGetMeetingsByCourseAndStatusQuery,
     useGetMeetingQuery
 } = apiSlice;

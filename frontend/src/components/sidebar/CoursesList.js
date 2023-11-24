@@ -11,6 +11,7 @@ let CourseButton = ({ course }) => {
     const handleCourseClick = (course) => {
         dispatch(storeCourse({ course: course }));
         navigate(`/${formatStringToUrl(course.name)}`);
+        // navigate(`/courses/${formatStringToUrl(course.name)}`);
     }
 
     return (

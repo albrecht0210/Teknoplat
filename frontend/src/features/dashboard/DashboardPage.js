@@ -11,6 +11,7 @@ let DashboardCard = ({ course }) => {
     const handleCourseClick = (course) => {
         dispatch(storeCourse({ course: course }));
         navigate(`/${formatStringToUrl(course.name)}`);
+        // navigate(`/courses/${formatStringToUrl(course.name)}`);
     }
 
     return (
@@ -57,8 +58,6 @@ let DashboardLoadingCard = () => {
                     position: 'absolute',
                     top: 0,
                     left: 0,
-                    width: '100%',
-                    height: '100%',
                     background: `linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent)`,
                     animation: 'loading 2s infinite linear',
                 },
@@ -85,7 +84,9 @@ function DashboardPage() {
 
     return (
         <Box>
-            { content }
+            <Stack direction="row" spacing={3}>
+                { content }
+            </Stack>
         </Box>
     );
 }
