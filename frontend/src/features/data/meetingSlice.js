@@ -34,6 +34,7 @@ export const {
     storeMeetings,
     storeMeeting,
     storeMeetingByName,
+    storeStatus,
     deStoreMeetings,
     deStoreMeeting
 } = meetingSlice.actions;
