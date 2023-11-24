@@ -1,0 +1,50 @@
+[
+    {
+        "name": "Tech Innovation Challenge",
+        "description": "A competition for tech enthusiasts to present their innovative solutions and ideas to a panel of judges for a chance to win prizes and support.",
+        "course": 1,
+        "status": "pending",
+        "service": 3,
+        "owner": "f8578155-eb08-47db-8bea-5eb55205b6d3"
+    },
+    {
+        "name": "Tech Pitch Night",
+        "description": "An evening event where tech enthusiasts and startups have the opportunity to pitch their ideas to a live audience and panel of judges.",
+        "course": 1,
+        "status": "in_progress",
+        "service": 3,
+        "owner": "f8578155-eb08-47db-8bea-5eb55205b6d3"
+    },
+    {
+        "name": "Startup Expo 2023",
+        "description": "The largest technology startup expo of the year, featuring hundreds of innovative startups showcasing their products and ideas.",
+        "course": 1,
+        "status": "completed",
+        "service": 3,
+        "owner": "f8578155-eb08-47db-8bea-5eb55205b6d3"
+    },
+    {
+        "name": "Tech Startup Bootcamp",
+        "description": "A weekend bootcamp for aspiring tech entrepreneurs to refine their ideas, develop pitches, and gain valuable insights from mentors.",
+        "course": 2,
+        "status": "pending",
+        "service": 3,
+        "owner": "f8578155-eb08-47db-8bea-5eb55205b6d3"
+    },
+    {
+        "name": "Innovation Challenge",
+        "description": "A competition where technology enthusiasts and entrepreneurs pitch their groundbreaking ideas for a chance to win funding and support.",
+        "course": 2,
+        "status": "in_progress",
+        "service": 3,
+        "owner": "f8578155-eb08-47db-8bea-5eb55205b6d3"
+    },
+    {
+        "name": "Tech Innovators Summit",
+        "description": "A two-day summit bringing together technology innovators, investors, and industry leaders to discuss emerging trends and pitch new ideas.",
+        "course": 2,
+        "status": "completed",
+        "service": 3,
+        "owner": "f8578155-eb08-47db-8bea-5eb55205b6d3"
+    }
+]

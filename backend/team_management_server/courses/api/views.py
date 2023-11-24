@@ -1,0 +1,82 @@
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from rest_framework import generics, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+from ..models import Course
+from .serializers import CourseSerializer
+from team_management_server.permissions import IsWildcatAdminOrReadOnly
+from accounts.api.serializers import AccountSerializer
+
+Account = get_user_model()
+
+class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = (permissions.IsAuthenticated, IsWildcatAdminOrReadOnly, )
+
+    @action(detail=True, methods=['post'])
+    def add_course_member(self, request, pk=None):
+        course = self.get_object()
+        account_id = request.data.get('account')
+
+        if course is None:
+            return Response({'error': 'Course not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if account_id is None:
+            return Response({'error': 'Account username is missing from the request data.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            account = get_object_or_404(Account, pk=account_id)
+            course_members = course.members.all()
+            list_account_courses = Course.objects.filter(code=course.code, name=course.name, members__in=[account]).exclude(pk=course.pk)
+
+            if account.is_staff and course_members.filter(is_staff=True).exists():
+                return Response({'error': 'A teacher is already a member of the course.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if list_account_courses.exists() and not account.is_staff:
+                return Response({'error': 'Account has already enrolled in a course with the same name.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if account in course_members:
+                return Response({'message': 'Member already added to the course.'}, status=status.HTTP_200_OK)
+
+            course.members.add(account)
+            course.save()
+
+            return Response(AccountSerializer(account).data, status=status.HTTP_201_CREATED)
+        except Account.DoesNotExist:
+            return Response({"error": "Account not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=True, methods=['get'])
+    def get_course_members(self, request, pk=None):
+        course = self.get_object()
+
+        if course is None:
+            return Response({'error': 'Course not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        course_members = course.members.all()
+
+        if not course_members.exists():
+            return Response({'message': 'No members found for the course.'}, status=status.HTTP_200_OK)
+
+        account_serializer = AccountSerializer(course_members, many=True)
+
+        return Response(account_serializer.data, status=status.HTTP_200_OK)
+
+class AccountCourseAPIView(generics.ListAPIView):
+    serializer_class = CourseSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        try:
+            queryset = Course.objects.filter(members__in=[self.request.user.id])
+            print(queryset)
+            if not queryset.exists():
+                raise Course.DoesNotExist
+            return queryset
+        except Course.DoesNotExist:
+            return Response({'error', 'Course does not exists.'}, status=status.HTTP_404_NOT_FOUND)
+        

@@ -1,0 +1,62 @@
+[
+    {
+        "name": "Innovation",
+        "description": "The uniqueness and originality of the startup's idea or product."
+    },
+    {
+        "name": "Market Potential",
+        "description": "The size and growth potential of the target market."
+    },
+    {
+        "name": "Team Expertise",
+        "description": "The skills and experience of the founding team."
+    },
+    {
+        "name": "Execution Plan",
+        "description": "The well-defined strategy and plan for bringing the idea to market."
+    },
+    {
+        "name": "Financial Viability",
+        "description": "The ability of the startup to generate revenue and achieve profitability."
+    },
+    {
+        "name": "Technology Readiness",
+        "description": "The level of development and readiness of the technology or solution."
+    },
+    {
+        "name": "Market Fit",
+        "description": "How well the product or service aligns with the needs and preferences of the target market."
+    },
+    {
+        "name": "Customer Acquisition Strategy",
+        "description": "The plan for acquiring and retaining customers in a cost-effective manner."
+    },
+    {
+        "name": "Scalability",
+        "description": "The ability of the business to scale operations efficiently as demand increases."
+    },
+    {
+        "name": "Competitive Landscape",
+        "description": "An analysis of competitors and the startup's unique positioning in the market."
+    },
+    {
+        "name": "Regulatory Compliance",
+        "description": "Adherence to relevant laws and regulations in the industry or market."
+    },
+    {
+        "name": "Customer Feedback",
+        "description": "Feedback from early customers regarding the product or service experience."
+    },
+    {
+        "name": "Strategic Partnerships",
+        "description": "Collaborations and partnerships that can enhance the startup's growth and capabilities."
+    },
+    {
+        "name": "Risks and Mitigations",
+        "description": "Identification of potential risks and a plan for mitigating them."
+    },
+    {
+        "name": "Sustainability Practices",
+        "description": "Incorporation of environmentally and socially sustainable practices in the business model."
+    }
+]

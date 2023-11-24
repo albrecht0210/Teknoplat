@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Nighters",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vehicula, libero id scelerisque luctus, tortor ex congue nulla, nec vulputate quam ipsum id massa. Phasellus non justo a dui hendrerit posuere.",
+        "max_members": 3,
+        "course": 1
+    },
+    {
+        "name": "Dayers",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vehicula, libero id scelerisque luctus, tortor ex congue nulla, nec vulputate quam ipsum id massa. Phasellus non justo a dui hendrerit posuere.",
+        "max_members": 3,
+        "course": 1
+    },
+    {
+        "name": "DjangoIsDead",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vehicula, libero id scelerisque luctus, tortor ex congue nulla, nec vulputate quam ipsum id massa. Phasellus non justo a dui hendrerit posuere.",
+        "max_members": 3,
+        "course": 2
+    },
+    {
+        "name": "ReactToThis",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vehicula, libero id scelerisque luctus, tortor ex congue nulla, nec vulputate quam ipsum id massa. Phasellus non justo a dui hendrerit posuere.",
+        "max_members": 3,
+        "course": 2
+    }
+]

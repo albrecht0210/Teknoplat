@@ -1,0 +1,22 @@
+[
+    {
+        "criteria": 1, 
+        "weight": 0.15
+    },
+    {
+        "criteria": 2, 
+        "weight": 0.2
+    },
+    {
+        "criteria": 5, 
+        "weight": 0.1
+    },
+    {
+        "criteria": 8, 
+        "weight": 0.25
+    },
+    {
+        "criteria": 12, 
+        "weight": 0.3
+    }
+]

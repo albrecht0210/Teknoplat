@@ -1,0 +1,114 @@
+[   
+    {
+        "username": "456-789-12",
+        "email": "ralph.laviste@cit.edu",
+        "first_name": "Ralph",
+        "last_name": "Laviste",
+        "password": "teachertest@12345",
+        "choose_role": "teacher"
+    },
+    {
+        "username": "987-654-32",
+        "email": "cherry.romana@cit.edu",
+        "first_name": "Cherry",
+        "last_name": "Sta. Romana",
+        "password": "teachertest@12345",
+        "choose_role": "teacher"
+    },
+    {
+        "username": "18-6056-484",
+        "email": "albrechtchristian.lanojan@cit.edu",
+        "first_name": "Albrecht",
+        "last_name": "Lanojan",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "19-5466-565",
+        "email": "johnmark.senining@cit.edu",
+        "first_name": "John Mark",
+        "last_name": "Senining",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "19-6574-346",
+        "email": "jaymark.carba@cit.edu",
+        "first_name": "Jaymark",
+        "last_name": "Carba",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "19-7965-686",
+        "email": "eurese.bustamante@cit.edu",
+        "first_name": "Eurese",
+        "last_name": "Bustamante",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "19-2315-111",
+        "email": "jane.smith@cit.edu",
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "19-1245-666",
+        "email": "alice.johnson@cit.edu",
+        "first_name": "Alice",
+        "last_name": "Johnson",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "18-4567-890",
+        "email": "maria.rodriguez@cit.edu",
+        "first_name": "Maria",
+        "last_name": "Rodriguez",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "19-8888-555",
+        "email": "jameson.patel@cit.edu",
+        "first_name": "Jameson",
+        "last_name": "Patel",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "18-4512-789",
+        "email": "sophia.anderson@cit.edu",
+        "first_name": "Sophia",
+        "last_name": "Anderson",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "19-5678-901",
+        "email": "emma.williams@cit.edu",
+        "first_name": "Emma",
+        "last_name": "Williams",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "18-5354-643",
+        "email": "trisha.mickela@cit.edu",
+        "first_name": "Trisha",
+        "last_name": "Mickela",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    },
+    {
+        "username": "18-5396-874",
+        "email": "enna.alouette@cit.edu",
+        "first_name": "Enna",
+        "last_name": "Alouette",
+        "password": "studenttest@12345",
+        "choose_role": "student"
+    }
+]

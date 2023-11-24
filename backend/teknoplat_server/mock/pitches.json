@@ -1,0 +1,22 @@
+[
+    {
+        "name": "SmartHome Innovations",
+        "description": "Revolutionizing home automation with AI-driven solutions for enhanced security and energy efficiency.",
+        "team": 1
+    },
+    {
+        "name": "HealthTech Analytics",
+        "description": "Developing advanced analytics tools to empower healthcare professionals in making data-driven decisions for improved patient care.",
+        "team": 2
+    },
+    {
+        "name": "EcoTech Harvest",
+        "description": "Creating sustainable agricultural solutions through the integration of IoT, data analytics, and precision farming techniques.",
+        "team": 3
+    },
+    {
+        "name": "FutureEd Tech",
+        "description": "Transforming education through cutting-edge technology, providing personalized learning experiences and adaptive curriculum.",
+        "team": 4
+    }
+]
