@@ -32,8 +32,8 @@ let MeetingRow = ({ meeting }) => {
                 </Button>
             </TableCell>
             <TableCell>{ meeting.name }</TableCell>
-            <TableCell>{ (parseFloat(meeting.teacher_weight_score) * 100).toFixed(0) + "%" }</TableCell>
-            <TableCell>{ (parseFloat(meeting.student_weight_score) * 100).toFixed(0) + "%" }</TableCell>
+            <TableCell>{ `${meeting.teacher_weight_score * 100}%` }</TableCell>
+            <TableCell>{ `${meeting.student_weight_score * 100}%` }</TableCell>
         </TableRow>
     )
 }

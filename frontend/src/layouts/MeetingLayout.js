@@ -11,7 +11,7 @@ function MeetingLayout() {
     const { paths } = useSelector((state) => state.path);
     const { data: pitches = [], isSuccess: pitchFetchSuccess, refetch: refetchPitches } = useGetMeetingPitchesQuery({ id: meeting?.id });
     const { data: criteria = [], isSuccess: criteriaFetchSucces, refetch: refetchCriteria } = useGetMeetingCriteriaQuery({ id: meeting?.id })
-
+    
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();

@@ -54,16 +54,16 @@ function UrlPaths() {
                         }
                     ]
                 },
-                {
-                    path: "video_meet/",
-                    element: <VideoLayout />,
-                    children: [
-                        {
-                            path: "",
-                            element: <VideoPage />
-                        }
-                    ]
-                }
+                // {
+                //     path: "video_meet/",
+                //     element: <VideoLayout />,
+                //     children: [
+                //         {
+                //             path: ":meeting",
+                //             element: <VideoPage />
+                //         }
+                //     ]
+                // }
             ]
         }
     ];

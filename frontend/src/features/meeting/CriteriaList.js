@@ -15,7 +15,7 @@ let Criteria = ({ criteria }) => {
                 </Stack>
             </AccordionSummary>
             <AccordionDetails>
-                {/* <Typography sx={{ mb: 2 }}>{ criteria.description }</Typography> */}
+                <Typography sx={{ mb: 2 }}>{ criteria.description }</Typography>
             </AccordionDetails>
         </Accordion>
     )
@@ -29,8 +29,8 @@ function CriteriaList() {
     if (criterias.length === 0) {
         content = null;
     } else {
-        content = criterias.map((criteria, index) => (
-            <Criteria key={index} criteria={criteria} />
+        content = criterias.map((criteria) => (
+            <Criteria key={criteria.id} criteria={criteria} />
         ));
     }
 
