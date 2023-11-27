@@ -10,6 +10,8 @@ import CoursePage from "./features/course/CoursePage";
 import ErrorPage from "./features/error/ErrorPage";
 
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import MeetingLayout from "./layouts/MeetingLayout";
+import MeetingPage from "./features/meeting/MeetingPage";
 
 function UrlPaths() {
     const { access } = useSelector((state) => state.auth);
@@ -33,13 +35,35 @@ function UrlPaths() {
                             element: <CourseLayout />,
                             children: [
                                 {
-                                    path: ":course",
+                                    path: ":course/",
                                     element: <CoursePage />,
+                                    children: [
+                                        {
+                                            path: "meetings/",
+                                            element: <MeetingLayout />,
+                                            children: [
+                                                {
+                                                    path: ":meeting/",
+                                                    element: <MeetingPage />
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }
                     ]
                 },
+                {
+                    path: "video_meet/",
+                    element: <VideoLayout />,
+                    children: [
+                        {
+                            path: "",
+                            element: <VideoPage />
+                        }
+                    ]
+                }
             ]
         }
     ];

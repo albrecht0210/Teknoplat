@@ -5,6 +5,8 @@ import { accountSlice } from './features/data/accountSlice';
 import { courseSlice } from './features/data/courseSlice';
 import { meetingSlice } from './features/data/meetingSlice';
 import { pathSlice } from './features/data/pathSlice';
+import { pitchSlice } from './features/data/pitchSlice';
+import { criteriaSlice } from './features/data/criteriaSlice';
 
 export default configureStore({
     reducer: {
@@ -14,6 +16,8 @@ export default configureStore({
         [accountSlice.name]: accountSlice.reducer,
         [courseSlice.name]: courseSlice.reducer,
         [meetingSlice.name]: meetingSlice.reducer,
+        [pitchSlice.name]: pitchSlice.reducer,
+        [criteriaSlice.name]: criteriaSlice.reducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSlice.middleware)
 });

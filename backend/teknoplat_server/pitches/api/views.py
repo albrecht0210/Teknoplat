@@ -1,5 +1,6 @@
 import requests
 from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from ..models import Pitch
 from .serializers import PitchSerializer
@@ -26,6 +27,11 @@ class PitchViewSet(viewsets.ModelViewSet):
         response = requests.get(f'http://localhost:8080/api/teams/{team_id}/', headers=headers)
         return response
     
+    def fetch_team_members(self, team_id):
+        headers = self.get_auth_headers()
+        response = requests.get(f'http://localhost:8080/api/teams/{team_id}/get_team_members/', headers=headers)
+        return response
+    
     def create(self, request, *args, **kwargs):
         team_id = request.data.get('team')
         team = self.fetch_team(team_id)
@@ -39,3 +45,19 @@ class PitchViewSet(viewsets.ModelViewSet):
             pitch_serializer.save()
             return Response(pitch_serializer.data, status=status.HTTP_201_CREATED)
         return Response(pitch_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['get'])
+    def get_team(self, request, pk=None):
+        pitch = self.get_object()
+        team = self.fetch_team(pitch.team)
+        
+        return Response(team.json(), status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['get'])
+    def get_team_members(self, request, pk=None):
+        pitch = self.get_object()
+        members = self.fetch_team_members(pitch.team)
+        
+        return Response(members.json(), status=status.HTTP_200_OK)
+
+    

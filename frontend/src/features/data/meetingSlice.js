@@ -15,7 +15,7 @@ export const meetingSlice = createSlice({
             }
         },
         storeMeeting: (state, { payload }) => {
-            state.meeting = state.meeting.find((meeting) => meeting.id === payload.meeting.id);
+            state.meeting = state.meetings.find((meeting) => meeting.id === payload.meeting.id);
         },
         storeMeetingByName: (state, { payload }) => {
             state.meeting = state.meeting.find((meeting) => meeting.name === payload.name);

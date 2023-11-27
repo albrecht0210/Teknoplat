@@ -7,7 +7,6 @@ export const accountSlice = createSlice({
     },
     reducers: {
         storeProfile: (state, { payload }) => {
-            console.log(payload.profile);
             state.profile = payload.profile;
         },
         deStoreProfile: (state) => {

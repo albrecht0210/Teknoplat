@@ -5,12 +5,12 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useGetAccountCoursesQuery } from "../features/api/apiSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { storeCourse, storeCourses } from "../features/data/courseSlice";
+import { storeCourses } from "../features/data/courseSlice";
 import { storeCoursePaths, storeCurrent } from "../features/data/pathSlice";
 
 function DrawerLayout() {
     const { paths } = useSelector((state) => state.path);
-    const { data: courses = [], isSuccess } = useGetAccountCoursesQuery();
+    const { data: courses = [], isSuccess, isError, refetch } = useGetAccountCoursesQuery();
     
     const location = useLocation();
     const dispatch = useDispatch();
@@ -35,9 +35,19 @@ function DrawerLayout() {
 
     useEffect(() => {
         if (isSuccess && paths.length !== 3) {
+            if (currentUrl.includes("/meetings")) {
+                const urlPatterns = currentUrl.split("/meetings");
+                dispatch(storeCurrent({ url: urlPatterns[0] }));
+            }
             dispatch(storeCurrent({ url: currentUrl }));
         }
     }, [dispatch, courses, isSuccess, currentUrl, paths]);
+
+    useEffect(() => {
+        if (isError) {
+            refetch();
+        }
+    }, [refetch, isError])
 
     return (
         <Box>

@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Map } from 'immutable';
 
 export const pathSlice = createSlice({
     name: "path",
@@ -13,7 +14,6 @@ export const pathSlice = createSlice({
     },
     reducers: {
         storeCoursePaths: (state, { payload }) => {
-            console.log(payload);
             return {
                 ...state,
                 paths: state.paths.concat(payload.course)
@@ -26,11 +26,14 @@ export const pathSlice = createSlice({
             }
         },
         storeCurrent: (state, { payload }) => {
-            if (state.current !== null) {
+            const currentPath = state.paths.find((path) => path.to === payload.url);
+            const onHistory = state.history.find((path) => path.to === payload.url);
+            console.log(payload.url, state.current !== null && !(Map(state.current).equals(Map(currentPath))) && onHistory === undefined);
+            if (state.current !== null && !(Map(state.current).equals(Map(currentPath))) && onHistory === undefined) {
                 state.history.push(state.current);
             }
-            const currentPath = state.paths.find((path) => path.to === payload.url);
-            if (currentPath !== undefined || state.current !== currentPath) {
+            console.log(payload.url, currentPath !== undefined && !(Map(state.current).equals(Map(currentPath))));
+            if (currentPath !== undefined && !(Map(state.current).equals(Map(currentPath)))) {
                 state.current = currentPath;
             }
         },

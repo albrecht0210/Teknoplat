@@ -2,17 +2,31 @@ import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetMeetingsByCourseAndStatusQuery } from "../api/apiSlice";
-import { storeMeetings } from "../data/meetingSlice";
+import { storeMeeting, storeMeetings } from "../data/meetingSlice";
 import { formatStringToUrl } from "../../utils/helper";
 import { storeMeetingPaths } from "../data/pathSlice";
+import { useLocation, useNavigate } from "react-router-dom";
 
 let MeetingRow = ({ meeting }) => {
+    const dispatch = useDispatch();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const currentUrl = location.pathname;
+
+    const handleMeetingClick = (meeting) => {
+        dispatch(storeMeeting({ meeting: meeting }));
+        const url = `${currentUrl}/meetings/${formatStringToUrl(meeting.name)}`;
+        navigate(url);
+    }
+
     return (
         <TableRow>
             <TableCell>
                 <Button
                     variant="contained"
                     size="small"
+                    onClick={() => handleMeetingClick(meeting)}
                 >
                     View
                 </Button>
@@ -71,8 +85,6 @@ function MeetingTable(props) {
 
     useEffect(() => {
         if (isSuccess) {
-            console.log(status);
-            console.log(meetings);
             dispatch(storeMeetings({ meetings: meetings }));
             
             const meetingPaths = meetings.map((meeting) => {

@@ -18,6 +18,7 @@ function AuthenticatedLayout() {
             const data = { credentials: { refresh: Cookies.get("refresh") } }
             await reauthenticate(data).unwrap()
                 .then((payload) => {
+                    Cookies.set("access", payload.access);
                     dispatch(storeAccessToken(payload));
                     refetch();
                 })

@@ -39,6 +39,9 @@ export const apiSlice = createApi({
         getCourseDetail: builder.query({
             query: (payload) => `http://localhost:8080/api/courses/${payload.id}/`
         }),
+        getCourseMembers: builder.query({
+            query: (payload) => `http://localhost:8080/api/courses/${payload.id}/get_course_members/`
+        }),
 
         // Teknoplat Server
         getMeetingsByCourse: builder.query({
@@ -49,7 +52,19 @@ export const apiSlice = createApi({
         }),
         getMeeting: builder.query({
             query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/`
-        })
+        }),
+        getMeetingPitches: builder.query({
+            query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/get_meeting_presentors/`
+        }),
+        getMeetingCriteria: builder.query({
+            query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/get_meeting_criteria/`
+        }),
+        getPitchTeam: builder.query({
+            query: (payload) => `http://localhost:8008/api/pitches/${payload.id}/get_team/`
+        }),
+        getPitchTeamMembers: builder.query({
+            query: (payload) => `http://localhost:8008/api/pitches/${payload.id}/get_team_members/`
+        }),
     })
 });
 
@@ -62,9 +77,14 @@ export const {
     // Team Management Server
     useGetAccountCoursesQuery,
     useGetCourseDetailQuery,
+    useGetCourseMembersQuery,
 
     // Teknoplat Server
     useGetMeetingsByCourseQuery,
     useGetMeetingsByCourseAndStatusQuery,
-    useGetMeetingQuery
+    useGetMeetingQuery, 
+    useGetMeetingPitchesQuery,
+    useGetMeetingCriteriaQuery,
+    useGetPitchTeamQuery,
+    useGetPitchTeamMembersQuery,
 } = apiSlice;

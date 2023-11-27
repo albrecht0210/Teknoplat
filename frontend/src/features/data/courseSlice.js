@@ -4,7 +4,8 @@ export const courseSlice = createSlice({
     name: "course",
     initialState: {
         courses: [],
-        course: null
+        course: null,
+        members: []
     },
     reducers: {
         storeCourses: (state, { payload }) => {
@@ -15,6 +16,9 @@ export const courseSlice = createSlice({
         },
         storeCourseByName: (state, { payload }) => {
             state.course = state.courses.find((course) => course.name === payload.name);
+        },
+        storeCourseMembers: (state, { payload }) => {
+            state.members = payload.members;
         },
         deStoreCourses: (state) => {
             state.courses = [];
@@ -29,6 +33,8 @@ export const courseSlice = createSlice({
 export const {
     storeCourses,
     storeCourse,
+    storeCourseByName,
+    storeCourseMembers,
     deStoreCourses,
     deStoreCourse
 } = courseSlice.actions;
