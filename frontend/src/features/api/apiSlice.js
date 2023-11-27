@@ -42,10 +42,10 @@ export const apiSlice = createApi({
 
         // Teknoplat Server
         getMeetingsByCourse: builder.query({
-            query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}/`
+            query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}`
         }),
         getMeetingsByCourseAndStatus: builder.query({
-            query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}&state=${payload.status}/`
+            query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}&status=${payload.status}`
         }),
         getMeeting: builder.query({
             query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/`

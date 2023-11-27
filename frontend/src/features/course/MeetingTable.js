@@ -1,5 +1,10 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-import { useSelector } from "react-redux";
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useGetMeetingsByCourseAndStatusQuery } from "../api/apiSlice";
+import { storeMeetings } from "../data/meetingSlice";
+import { formatStringToUrl } from "../../utils/helper";
+import { storeMeetingPaths } from "../data/pathSlice";
 
 let MeetingRow = ({ meeting }) => {
     return (
@@ -22,19 +27,71 @@ let MeetingRow = ({ meeting }) => {
 let MeetingLoadingRow = () => {
     return (
         <TableRow>
-            <TableCell />
+            <TableCell>
+                <Button
+                    variant="contained"
+                    size="small"
+                    className="loadingSlide"
+                >
+                    <span style={{ visibility: "hidden" }}>View</span>
+                </Button>
+            </TableCell>
+            <TableCell>
+                <Typography className="loadingSlide">
+                    <span style={{ visibility: "hidden" }}>Loading...</span>
+                </Typography>
+            </TableCell>
+            <TableCell>
+                <Typography className="loadingSlide">
+                    <span style={{ visibility: "hidden" }}>Loading...</span>
+                </Typography>
+            </TableCell>
+            <TableCell>
+                <Typography className="loadingSlide">
+                    <span style={{ visibility: "hidden" }}>Loading...</span>
+                </Typography>
+            </TableCell>
         </TableRow>
     );
 }
 
 function MeetingTable(props) {
-    const { search, status, loading } = props;
-    const { meetings } = useSelector((state) => state.meeting);
+    const { search, status } = props;
+    const { course } = useSelector((state) => state.course);
+
+    const { data: meetings = [], isSuccess, refetch } = useGetMeetingsByCourseAndStatusQuery({ course: course?.id, status: status });
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (course !== null) {
+            refetch();
+        }
+    }, [refetch, course]);
+
+    useEffect(() => {
+        if (isSuccess) {
+            console.log(status);
+            console.log(meetings);
+            dispatch(storeMeetings({ meetings: meetings }));
+            
+            const meetingPaths = meetings.map((meeting) => {
+                return {
+                    type: "meeting",
+                    name: `${meeting.name}`,
+                    to: `/courses/${course.code.toLowerCase()}_${course.section.toLowerCase()}/meetings/${formatStringToUrl(meeting.name)}`
+                };
+            });
+
+            dispatch(storeMeetingPaths({ meeting: meetingPaths }));
+        }
+    }, [dispatch, course, meetings, isSuccess]);
 
     let content;
 
-    if (loading && meetings.length === 0) {
-        content = [0, 1, 2].map((item) => (
+    if (meetings.length === 0) {
+    // if (true) {
+        content = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
             <MeetingLoadingRow key={item} />
         ));
     } else {
@@ -47,8 +104,8 @@ function MeetingTable(props) {
     }
 
     return (
-        <TableContainer component={Paper}>
-            <Table aria-label="meeting-table">
+        <TableContainer component={Paper} sx={{ height: "100%" }}>
+            <Table stickyHeader aria-label="meeting-table">
                 <TableHead>
                     <TableRow>
                         <TableCell sx={{ width: "calc(100% * 0.09)" }}></TableCell>

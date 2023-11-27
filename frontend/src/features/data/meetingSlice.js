@@ -9,7 +9,10 @@ export const meetingSlice = createSlice({
     },
     reducers: {
         storeMeetings: (state, { payload }) => {
-            state.meetings = payload.meetings;
+            return {
+                ...state,
+                meetings: state.meetings.concat(payload.meetings)
+            }
         },
         storeMeeting: (state, { payload }) => {
             state.meeting = state.meeting.find((meeting) => meeting.id === payload.meeting.id);

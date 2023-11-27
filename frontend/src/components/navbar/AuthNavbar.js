@@ -1,5 +1,5 @@
 import { AppBar, Toolbar } from "@mui/material";
-import Logo from "../Logo";
+import HistoryNavigator from "../../features/history/HistoryNavigator";
 
 function AuthNavbar(props) {
     const { width } = props;
@@ -10,7 +10,7 @@ function AuthNavbar(props) {
             sx={{ width: `calc(100% - ${width}px)`, ml: `${width}px` }}
         >
             <Toolbar sx={{ p: "0px 12px !important" }}>
-                <Logo />
+                <HistoryNavigator />
             </Toolbar>
         </AppBar>
     );

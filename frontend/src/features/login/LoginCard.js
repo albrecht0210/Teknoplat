@@ -47,8 +47,10 @@ function LoginCard() {
                     navigate("/");
                 })
                 .catch((error) => {
-                    console.log(error)
-                    // enqueueSnackbar(error.data?.detail, { variant: 'error' })
+                    const errorMessage = "detail" in error.data ? error.data.detail : "";
+
+                    enqueueSnackbar(errorMessage, { variant: 'error' });
+                    
                     setFormData((previousFormData) => ({
                         ...previousFormData,
                         password: ""

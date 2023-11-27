@@ -7,10 +7,10 @@ import AccountOption from "./AccountOption";
 import CoursesList from "./CoursesList";
 import { useState } from "react";
 import { deStoreCourse } from "../../features/data/courseSlice";
+import { deStoreHistory } from "../../features/data/pathSlice";
+import { storeStatus } from "../../features/data/meetingSlice";
 
-function Sidebar(props) {
-    const { profileLoading, coursesLoading } = props;
-    
+function Sidebar() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -18,7 +18,11 @@ function Sidebar(props) {
 
     const handleDashboardClick = () => {
         dispatch(deStoreCourse());
-        navigate("/");
+        dispatch(deStoreHistory());
+        dispatch(storeStatus({ status: "in_progress" }));
+        localStorage.removeItem("searchMeeting");
+        const url = "/";
+        navigate(url);
     }
 
     const handleCoursesOptionClick = () => {
@@ -58,7 +62,7 @@ function Sidebar(props) {
                     </ListItemButton>
                 </ListItem>
                 {/* <CoursesList loading={true} open={isCoursesOptionClicked} /> */}
-                <CoursesList loading={coursesLoading} open={isCoursesOptionClicked} />
+                <CoursesList open={isCoursesOptionClicked} />
 
                 <Divider />
                 
@@ -75,7 +79,7 @@ function Sidebar(props) {
             <Divider sx={{ mt: "auto" }} />
 
             {/* <AccountOption loading={true} /> */}
-            <AccountOption loading={profileLoading} />
+            <AccountOption />
         </Drawer>
     );
 }

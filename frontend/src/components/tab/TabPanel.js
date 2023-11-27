@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 
 function TabPanel(props) {
-    const { selected, name, value, children } = props;
+    const { selected, name, value, height, children } = props;
     
     return (
         <div 
@@ -9,7 +9,7 @@ function TabPanel(props) {
             hidden={selected !== value} 
             id={`${name}-tabpanel`}
             aria-labelledby={`${name}-tab`}
-            style={{ height: "72.2%" }}
+            style={{ height: height }}
         >
             <Box sx={{ p: 3, height: "100%" }}>
                 { children }

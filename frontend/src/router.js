@@ -2,13 +2,14 @@ import { useSelector } from "react-redux";
 import NotAuthenticatedLayout from "./layouts/NotAuthenticatedLayout";
 import AuthenticatedLayout from "./layouts/AuthenticatedLayout";
 import DrawerLayout from "./layouts/DrawerLayout";
+import CourseLayout from "./layouts/CourseLayout";
 
 import LoginPage from "./features/login/LoginPage";
 import DashboardPage from "./features/dashboard/DashboardPage";
 import CoursePage from "./features/course/CoursePage";
-import CourseLayout from "./layouts/CourseLayout";
+import ErrorPage from "./features/error/ErrorPage";
 
-const { createBrowserRouter, RouterProvider } = require("react-router-dom");
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 function UrlPaths() {
     const { access } = useSelector((state) => state.auth);
@@ -17,6 +18,7 @@ function UrlPaths() {
         {
             path: "/",
             element: <AuthenticatedLayout />,
+            errorElement: <ErrorPage />,
             children: [
                 {
                     path: "/",
@@ -27,19 +29,15 @@ function UrlPaths() {
                             element: <DashboardPage />
                         },
                         {
-                            path: ":course",
-                            element: <CoursePage />,
+                            path: "courses/",
+                            element: <CourseLayout />,
+                            children: [
+                                {
+                                    path: ":course",
+                                    element: <CoursePage />,
+                                }
+                            ]
                         }
-                        // {
-                        //     path: "courses/",
-                        //     element: <CourseLayout />,
-                        //     children: [
-                        //         {
-                        //             path: ":course",
-                        //             element: <CoursePage />,
-                        //         }
-                        //     ]
-                        // }
                     ]
                 },
             ]
@@ -50,6 +48,7 @@ function UrlPaths() {
         {
             path: "/",
             element: <NotAuthenticatedLayout />,
+            errorElement: <ErrorPage />,
             children: [
                 {
                     path: "",

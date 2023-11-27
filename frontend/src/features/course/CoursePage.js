@@ -9,17 +9,8 @@ import { useGetMeetingsByCourseQuery, useGetMeetingsQuery } from "../api/apiSlic
 import MeetingTable from "./MeetingTable";
 
 function CoursePage() {
-    const { course } = useSelector((state) => state.course);
     const { status } = useSelector((state) => state.meeting);
     const dispatch = useDispatch();
-
-    const { data: meetings = [], isLoading, isSuccess } = useGetMeetingsByCourseQuery({ course: course.id });
-
-    useEffect(() => {
-        if (isSuccess) {
-            dispatch(storeMeetings({ meetings: meetings }))
-        }
-    }, [dispatch, meetings, isLoading, isSuccess]);
 
     const tabOptions = [
         { value: 0, name: "Pending", stringValue: "pending" },
@@ -60,9 +51,10 @@ function CoursePage() {
                     selected={tabValue}
                     name={option.name}
                     value={option.value}
+                    height="calc(100% - 48px)"
                 >
                     {/* <Typography>Option {option.value + 1}</Typography> */}
-                    <MeetingTable search={search} status={status} loading={isLoading} />
+                    <MeetingTable search={search} status={status} />
                 </TabPanel>
             )) }
         </Box>

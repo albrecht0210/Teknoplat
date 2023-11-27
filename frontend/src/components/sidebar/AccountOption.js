@@ -1,6 +1,9 @@
 import { Logout } from "@mui/icons-material";
-import { Button, IconButton, Stack, Toolbar, Typography } from "@mui/material";
-import { useSelector } from "react-redux";
+import { Box, Button, IconButton, Stack, Toolbar, Typography } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { deStoreAuthCredentials } from "../../features/data/authSlice";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 let AccountButton = ({ profile }) => {
     return (
@@ -34,50 +37,54 @@ let AccountButton = ({ profile }) => {
 
 let AccountLoadingButton = () => {
     return (
-        <Button 
-            variant="text" 
-            sx={{
-                position: 'relative',
-                overflow: 'hidden',
-                background: '#333',
-                color: '#fff',
-                width: "175px",
-                "@keyframes loading": {
-                    "0%": {
-                        backgroundPosition: "-175px 0",
-                    },
-                    "100%": {
-                        backgroundPosition: "175px 0"
-                    }
-                },
-                '&:before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  background: `linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent)`,
-                  animation: 'loading 2s infinite linear',
-                },
-            }}
-        >
-            <span style={{ visibility: "hidden" }}>Loading</span>
+        <Button variant="text" sx={{ width: "175px", justifyContent: "flex-start" }}>
+            <Box
+                style={{ width: "30px", height: "30px", marginRight: "5px", borderRadius: "5px" }}
+                className="loadingSlide"
+            />
+            <Stack spacing={0}>
+                <Typography
+                    variant="caption"
+                    textAlign="left"
+                    sx={{ width: "calc(240px * .52)" }}
+                    className="loadingSlide"
+                >
+                    <span style={{ visibility: "hidden" }}>Loading...</span>
+                </Typography>
+                <Typography
+                    variant="caption"
+                    textAlign="left"
+                    fontSize={10}
+                    sx={{ width: "calc((240px * .52) / 2)" }}
+                    className="loadingSlide"
+                >
+                    <span style={{ visibility: "hidden" }}>Loading...</span>
+                </Typography>
+            </Stack>
         </Button>
     );
 }
 
 function AccountOption(props) {
-    const { loading } = props;
     const { profile } = useSelector((state) => state.account);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     let content;
 
-    if (loading || profile === null) {
+    if (profile === null) {
+    // if (true) {
         content = <AccountLoadingButton />;
     } else {
-        console.log(profile)
         content = <AccountButton profile={profile} />;
+    }
+
+    const handleLogoutClick = () => {
+        Cookies.remove("refresh");
+        Cookies.remove("access");
+        dispatch(deStoreAuthCredentials());
+        navigate("/");
     }
 
     return (
@@ -88,7 +95,7 @@ function AccountOption(props) {
                 alignItems="center"
             >
                 { content }
-                <IconButton aria-label="LogoutUser">
+                <IconButton onClick={handleLogoutClick} aria-label="LogoutUser">
                     <Logout />
                 </IconButton>
             </Stack>

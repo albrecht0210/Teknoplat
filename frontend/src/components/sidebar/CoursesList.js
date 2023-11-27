@@ -1,8 +1,8 @@
-import { Collapse, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { Collapse, List, ListItem, ListItemButton, ListItemText, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { storeCourse } from "../../features/data/courseSlice";
-import { formatStringToUrl } from "../../utils/helper";
+import { deStoreHistory } from "../../features/data/pathSlice";
 
 let CourseButton = ({ course }) => {
     const dispatch = useDispatch();
@@ -10,16 +10,17 @@ let CourseButton = ({ course }) => {
 
     const handleCourseClick = (course) => {
         dispatch(storeCourse({ course: course }));
-        navigate(`/${formatStringToUrl(course.name)}`);
-        // navigate(`/courses/${formatStringToUrl(course.name)}`);
+        dispatch(deStoreHistory());
+        const url = `/courses/${course.code.toLowerCase()}_${course.section.toLowerCase()}`;
+        navigate(url);
     }
 
     return (
         <ListItem disablePadding>
             <ListItemButton sx={{ pl: 4 }} onClick={() => handleCourseClick(course)}>
                 <ListItemText
-                    primary={`${course.code} ${course.name} (${course.section})`}
-                    primaryTypographyProps={{ fontSize: "0.9rem" }}
+                    primary={`${course.name}`}
+                    secondary={`${course.code} - ${course.section}`}
                 />
             </ListItemButton>
         </ListItem>
@@ -29,35 +30,18 @@ let CourseButton = ({ course }) => {
 let CourseLoadingButton = () => {
     return (
         <ListItem disablePadding>
-            <ListItemButton 
-                sx={{
-                    position: 'relative',
-                    overflow: 'hidden',
-                    background: '#333',
-                    color: '#fff',
-                    "@keyframes loading": {
-                        "0%": {
-                            backgroundPosition: "-300px 0",
-                        },
-                        "100%": {
-                            backgroundPosition: "300px 0"
-                        }
-                    },
-                    '&:before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      background: `linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent)`,
-                      animation: 'loading 2s infinite linear',
-                    },
-                }}
-            >
+            <ListItemButton >
                 <ListItemText
-                    primary="Loading"
-                    primaryTypographyProps={{ fontSize: "0.9rem", visibility: "hidden" }}
+                    primary={
+                        <Typography className="loadingSlide">
+                            <span style={{ visibility: "hidden" }}>Loading...</span>
+                        </Typography>
+                    }
+                    secondary={
+                        <Typography className="loadingSlide" sx={{ width: "calc(100% / 1.5)" }}>
+                            <span style={{ visibility: "hidden" }}>Loading...</span>
+                        </Typography>
+                    }
                 />
             </ListItemButton>
         </ListItem>
@@ -65,13 +49,14 @@ let CourseLoadingButton = () => {
 }
 
 function CoursesList(props) {
-    const { loading, open } = props;
+    const { open } = props;
     const { courses } = useSelector((state) => state.course);
 
     let content;
 
-    if (loading || courses.length === 0) {
-        content = [1, 2, 3].map((item) => (
+    if (courses.length === 0) {
+    // if (true) {
+        content = [1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
             <CourseLoadingButton key={item} />
         ));
     } else {
@@ -82,11 +67,27 @@ function CoursesList(props) {
 
     return (
         <Collapse in={open}>
-            <List>
+            <List 
+                sx={{ 
+                    maxHeight: "calc(100vh - (64px * 2.8) - (48px * 4) - 16px)", 
+                    overflow: "auto",
+                    scrollbarWidth: "thin",
+                    "&::-webkit-scrollbar": {
+                        width: "8px",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                        backgroundColor: (theme) => theme.palette.primary.main,
+                        borderRadius: "4px",
+                    },
+                    "&::-webkit-scrollbar-track": {
+                        backgroundColor: (theme) => theme.palette.background.paper,
+                    },
+                }}
+            >
                 { content }
             </List>
         </Collapse>
     );
 }
 
-export default CoursesList;
+export default CoursesList; 

@@ -1,8 +1,9 @@
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { formatStringToUrl } from "../../utils/helper";
 import { storeCourse } from "../data/courseSlice";
+import { deStoreHistory } from "../data/pathSlice";
+import { storeStatus } from "../data/meetingSlice";
 
 let DashboardCard = ({ course }) => {
     const dispatch = useDispatch();
@@ -10,8 +11,11 @@ let DashboardCard = ({ course }) => {
 
     const handleCourseClick = (course) => {
         dispatch(storeCourse({ course: course }));
-        navigate(`/${formatStringToUrl(course.name)}`);
-        // navigate(`/courses/${formatStringToUrl(course.name)}`);
+        dispatch(deStoreHistory());
+        dispatch(storeStatus({ status: "in_progress" }));
+        localStorage.removeItem("searchMeeting");
+        const url = `/courses/${course.code.toLowerCase()}_${course.section.toLowerCase()}`;
+        navigate(url);
     }
 
     return (
@@ -41,28 +45,21 @@ let DashboardLoadingCard = () => {
             sx={{ 
                 height: "calc((100vh - 64px - 50px) * 0.35)", 
                 width: "calc((100vw - 320px) * 0.3)",
-                position: 'relative',
-                overflow: 'hidden',
-                background: '#333',
-                color: '#fff',
-                "@keyframes loading": {
-                    "0%": {
-                        backgroundPosition: "-500px 0",
-                    },
-                    "100%": {
-                        backgroundPosition: "500px 0"
-                    }
-                },
-                '&:before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    background: `linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent)`,
-                    animation: 'loading 2s infinite linear',
-                },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center"
             }}
-        />
+        >
+            <Stack spacing={3}>
+                <Typography variant="h4" className="loadingSlide">
+                    <span style={{ visibility: "hidden" }}>CSIT441</span>
+                </Typography>
+                <Typography variant="h6" className="loadingSlide">
+                    <span style={{ visibility: "hidden" }}>Software Engineering (F2)</span>
+                </Typography>
+            </Stack>
+        </Paper>
     );
 }
 
@@ -73,7 +70,8 @@ function DashboardPage() {
     let content;
 
     if (courses.length === 0) {
-        content = [1, 2, 3, 4].map((item) => (
+    // if (true) {
+        content = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
             <DashboardLoadingCard key={item} />
         ));
     } else {
@@ -84,7 +82,7 @@ function DashboardPage() {
 
     return (
         <Box>
-            <Stack direction="row" spacing={3}>
+            <Stack direction="row" spacing={3} useFlexGap flexWrap="wrap">
                 { content }
             </Stack>
         </Box>

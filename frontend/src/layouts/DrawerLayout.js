@@ -2,38 +2,46 @@ import { Box, Toolbar } from "@mui/material";
 import Sidebar from "../components/sidebar/Sidebar";
 import AuthNavbar from "../components/navbar/AuthNavbar";
 import { Outlet, useLocation } from "react-router-dom";
-import { useGetAccountCoursesQuery, useGetProfileQuery } from "../features/api/apiSlice";
-import { useDispatch } from "react-redux";
+import { useGetAccountCoursesQuery } from "../features/api/apiSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { storeProfile } from "../features/data/accountSlice";
 import { storeCourse, storeCourses } from "../features/data/courseSlice";
+import { storeCoursePaths, storeCurrent } from "../features/data/pathSlice";
 
 function DrawerLayout() {
-    const { data: profile, isLoading: isProfileLoading, isSuccess: isProfileSuccess } = useGetProfileQuery();
-    const { data: courses = [], isLoading: isCoursesLoading, isSuccess: isCoursesSuccess } = useGetAccountCoursesQuery();
+    const { paths } = useSelector((state) => state.path);
+    const { data: courses = [], isSuccess } = useGetAccountCoursesQuery();
     
     const location = useLocation();
     const dispatch = useDispatch();
 
     const currentUrl = location.pathname;
-    const urlSegments = currentUrl.split('/').filter(segment => segment !== '');
-    
-    useEffect(() => {
-        if (isProfileSuccess && isCoursesSuccess) {
-            dispatch(storeProfile({ profile: profile }));
-            dispatch(storeCourses({ courses: courses }));
-        }
-    }, [dispatch, profile, courses, isProfileSuccess, isCoursesSuccess]);
 
     useEffect(() => {
-        if (isCoursesSuccess) {
-            dispatch(storeCourse({ course: courses.find((course) => course.name === urlSegments[0]) }));
+        if (isSuccess) {
+            dispatch(storeCourses({ courses: courses }));
+            
+            const coursePaths = courses.map((course) => {
+                return {
+                    type: "course",
+                    name: `${course.name} (${course.section})`,
+                    to: `/courses/${course.code.toLowerCase()}_${course.section.toLowerCase()}`
+                };
+            });
+
+            dispatch(storeCoursePaths({ course: coursePaths }));
         }
-    }, [dispatch, courses, isCoursesSuccess, urlSegments]);
+    }, [dispatch, courses, isSuccess]);
+
+    useEffect(() => {
+        if (isSuccess && paths.length !== 3) {
+            dispatch(storeCurrent({ url: currentUrl }));
+        }
+    }, [dispatch, courses, isSuccess, currentUrl, paths]);
 
     return (
         <Box>
-            <Sidebar profileLoading={isProfileLoading} coursesLoading={isCoursesLoading} />
+            <Sidebar />
             <AuthNavbar />
             <Box
                 pl="280px"
