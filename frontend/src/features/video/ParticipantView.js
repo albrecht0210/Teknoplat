@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import { useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
@@ -47,7 +47,7 @@ function ParticipantView(props) {
                   {micOn ? "ON" : "OFF"}
                 </p> */}
                 <audio ref={micRef} autoPlay playsInline muted={isLocal} />
-                {webcamOn && (
+                {webcamOn ? (
                   <ReactPlayer
                     //
                     playsinline // very very imp prop
@@ -65,6 +65,10 @@ function ParticipantView(props) {
                       console.log(err, "participant video error");
                     }}
                   />
+                ) : (
+                  <Box sx={{ display: "flex", justifyContent:"center", alignItems:"center", width: "100%"}}>
+                     {/* <PersonIcon /> */}
+                    </Box>
                 )}
               </Box>
             );
