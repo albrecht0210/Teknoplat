@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import TabContainer from "../../components/tab/TabContainer";
 import { useDispatch, useSelector } from "react-redux";
-import { storeMeetings, storeStatus } from "../data/meetingSlice";
+import { storeMeetingsOnCourse, storeStatus } from "../data/meetingSlice";
 import SearchInput from "./SearchInput";
 import TabPanel from "../../components/tab/TabPanel";
 import MeetingTable from "./MeetingTable";
@@ -12,20 +12,25 @@ import { storeMeetingPaths } from "../data/pathSlice";
 import { formatStringToUrl } from "../../utils/helper";
 
 let CourseRedirect = ({ currentUrl }) => {
+    // Retrieve course from store
     const { course } = useSelector((state) => state.course);
-    const dispatch = useDispatch();
 
+    // Fetch meetings via course id
     const { data: meetings = [], isSuccess, refetch } = useGetMeetingsByCourseQuery({ course: course?.id });
 
+    const dispatch = useDispatch();
+
     useEffect(() => {
+        // If course is not null then refetch
         if (course !== null) {
             refetch();
         }
     }, [refetch, course]);
 
     useEffect(() => {
+        // If succes in fetching meetings, store to meetings and store to meeting paths
         if (isSuccess) {
-            dispatch(storeMeetings({ meetings: meetings }));
+            dispatch(storeMeetingsOnCourse({ meetings: meetings }));
             
             const meetingPaths = meetings.map((meeting) => {
                 return {
@@ -45,10 +50,13 @@ let CourseRedirect = ({ currentUrl }) => {
 }
 
 function CoursePage() {
+    // Retrieve status from store
     const { status } = useSelector((state) => state.meeting);
-    const dispatch = useDispatch();
-    const location = useLocation();
 
+    const dispatch = useDispatch();
+
+    // Retrieve location
+    const location = useLocation();
     const currentUrl = location.pathname;
 
     const tabOptions = [
@@ -73,6 +81,7 @@ function CoursePage() {
         setSearch(event.target.value);
     }
     
+    // If the current url includes /meetings then return this component as CourseRedirect
     if (currentUrl.includes("/meetings")) {
         return (
             <CourseRedirect currentUrl={currentUrl} />

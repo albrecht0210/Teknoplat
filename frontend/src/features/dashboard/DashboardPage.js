@@ -5,6 +5,7 @@ import { storeCourse } from "../data/courseSlice";
 import { deStoreHistory } from "../data/pathSlice";
 import { storeStatus } from "../data/meetingSlice";
 
+// Course Card
 let DashboardCard = ({ course }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -39,6 +40,7 @@ let DashboardCard = ({ course }) => {
     );
 }
 
+// Course Loading Card
 let DashboardLoadingCard = () => {
     return (
         <Paper
@@ -65,10 +67,12 @@ let DashboardLoadingCard = () => {
 
 
 function DashboardPage() {
+    // Retrieve courses from store
     const { courses } = useSelector((state) => state.course);
 
     let content;
 
+    // If courses is empty load DashboardLoadingCard else DashboardCard
     if (courses.length === 0) {
     // if (true) {
         content = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (

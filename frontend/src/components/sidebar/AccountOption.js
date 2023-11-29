@@ -66,6 +66,7 @@ let AccountLoadingButton = () => {
 }
 
 function AccountOption(props) {
+    //  Retrieve profile from store
     const { profile } = useSelector((state) => state.account);
 
     const dispatch = useDispatch();
@@ -73,6 +74,7 @@ function AccountOption(props) {
 
     let content;
 
+    // If profile is null then use AccountLoadingButton else use AccountButton component
     if (profile === null) {
     // if (true) {
         content = <AccountLoadingButton />;

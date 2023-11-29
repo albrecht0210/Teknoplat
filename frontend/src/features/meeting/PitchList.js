@@ -1,30 +1,15 @@
 import { ExpandMore } from "@mui/icons-material";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Stack, Typography } from "@mui/material";
+import { useGetMembersForTeamQuery, useGetTeamsForPitchQuery } from "../api/apiSlice";
 import { useSelector } from "react-redux";
-import { useGetPitchTeamMembersQuery, useGetPitchTeamQuery } from "../api/apiSlice";
 
 let Pitch = ({ pitch }) => {
-    const { data: team, isSuccess: teamFetchSuccess } = useGetPitchTeamQuery({ id: pitch.id })
-    const { data: members = [], isSuccess: membersFetchSuccess } = useGetPitchTeamMembersQuery({ id: pitch.id });
-    
-    let teamName;
-    let membersName;
+    const { data: team } = useGetTeamsForPitchQuery({ id: pitch.id });
+    const { data: members = [] } = useGetMembersForTeamQuery({ id: pitch.id });
 
-    if (team !== null && teamFetchSuccess) {
-        teamName = <Typography>{team?.name}:</Typography>
+    if (team === null || team === undefined || members.length === 0) {
+        return <PitchLoading />
     } 
-
-    if (members.length !== 0 && membersFetchSuccess) {
-        membersName = (
-            <Stack direction="row" spacing={1}>
-                <Typography>Team Members: </Typography>
-                { members.map((member) => (
-                    <Typography key={member.id}>{member.full_name}, </Typography>
-                )) }
-            </Stack>
-        )
-    }
-
     return (
         <Accordion>
             <AccordionSummary
@@ -33,27 +18,57 @@ let Pitch = ({ pitch }) => {
                 id={`${pitch.name}-header`}
             >
                 <Stack direction="row" spacing={1}>
-                    { teamName }
-                    <Typography>{ pitch.name }</Typography>
+                    {/* <Typography>{`${pitch.name}`}</Typography> */}
+                    <Typography>{`${team.name} - ${pitch.name}`}</Typography>
                 </Stack>
             </AccordionSummary>
             <AccordionDetails>
                 <Typography sx={{ mb: 2 }}>{ pitch.description }</Typography>
-                { membersName }
+                <Stack direction="row" spacing={1}>
+                    <Typography>Team Members: </Typography>
+                    { members.map((member, index) => (
+                        <Typography key={member.id}>
+                            {member.full_name}{index !== members.length - 1 && <span>,</span>}
+                        </Typography>
+                    )) }
+                </Stack>
             </AccordionDetails>
         </Accordion>
-    )
+    );
+}
+
+let PitchLoading = ({ item }) => {
+    return (
+        <Accordion key={item}>
+            <AccordionSummary
+                expandIcon={<ExpandMore />}
+                aria-controls={`${item}-content`}
+                id={`${item}-header`}
+            >
+                <Stack direction="row" spacing={1}>
+                    <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
+                </Stack>
+            </AccordionSummary>
+            <AccordionDetails>
+                <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
+                <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
+                <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
+            </AccordionDetails>
+        </Accordion>
+    );
 }
 
 function PitchList() {
-    const { pitches } = useSelector((state) => state.pitch);
+    const { meeting } = useSelector((state) => state.meeting);
 
     let content;
 
-    if (pitches.length === 0) {
-        content = null;
+    if (meeting === null) {
+        content = [0, 1, 2, 3].map((item) => (
+            <PitchLoading key={item} item={item} />
+        ));
     } else {
-        content = pitches.map((pitch) => (
+        content = meeting.pitches.map((pitch) => (
             <Pitch key={pitch.id} pitch={pitch} />
         ));
     }

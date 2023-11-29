@@ -28,11 +28,9 @@ export const pathSlice = createSlice({
         storeCurrent: (state, { payload }) => {
             const currentPath = state.paths.find((path) => path.to === payload.url);
             const onHistory = state.history.find((path) => path.to === payload.url);
-            console.log(payload.url, state.current !== null && !(Map(state.current).equals(Map(currentPath))) && onHistory === undefined);
             if (state.current !== null && !(Map(state.current).equals(Map(currentPath))) && onHistory === undefined) {
                 state.history.push(state.current);
             }
-            console.log(payload.url, currentPath !== undefined && !(Map(state.current).equals(Map(currentPath))));
             if (currentPath !== undefined && !(Map(state.current).equals(Map(currentPath)))) {
                 state.current = currentPath;
             }

@@ -8,8 +8,11 @@ import { useEffect } from "react";
 import { storeCourses } from "../features/data/courseSlice";
 import { storeCoursePaths, storeCurrent } from "../features/data/pathSlice";
 
-function DrawerLayout() {
+function MainLayout() {
+    // Retrieve paths
     const { paths } = useSelector((state) => state.path);
+
+    // Fetch Courses
     const { data: courses = [], isSuccess, isError, refetch } = useGetAccountCoursesQuery();
     
     const location = useLocation();
@@ -18,6 +21,7 @@ function DrawerLayout() {
     const currentUrl = location.pathname;
 
     useEffect(() => {
+        // If succes in fetching courses, store to courses and store to course paths
         if (isSuccess) {
             dispatch(storeCourses({ courses: courses }));
             
@@ -44,10 +48,11 @@ function DrawerLayout() {
     }, [dispatch, courses, isSuccess, currentUrl, paths]);
 
     useEffect(() => {
+        // If Error in fetching courses, refetch
         if (isError) {
             refetch();
         }
-    }, [refetch, isError])
+    }, [refetch, isError]);
 
     return (
         <Box>
@@ -65,4 +70,4 @@ function DrawerLayout() {
     );
 }
 
-export default DrawerLayout;
+export default MainLayout;

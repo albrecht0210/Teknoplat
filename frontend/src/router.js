@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import NotAuthenticatedLayout from "./layouts/NotAuthenticatedLayout";
 import AuthenticatedLayout from "./layouts/AuthenticatedLayout";
-import DrawerLayout from "./layouts/DrawerLayout";
+import MainLayout from "./layouts/MainLayout";
 import CourseLayout from "./layouts/CourseLayout";
 
 import LoginPage from "./features/login/LoginPage";
@@ -24,7 +24,7 @@ function UrlPaths() {
             children: [
                 {
                     path: "/",
-                    element: <DrawerLayout />,
+                    element: <MainLayout />,
                     children: [
                         {
                             path: "",

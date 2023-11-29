@@ -21,16 +21,37 @@ let Criteria = ({ criteria }) => {
     )
 }
 
+let CriteriaLoading = ({ item }) => {
+    return (
+        <Accordion key={item}>
+            <AccordionSummary
+                expandIcon={<ExpandMore />}
+                aria-controls={`${item}-content`}
+                id={`${item}-header`}
+            >
+                <Stack direction="row" spacing={1}>
+                    <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
+                </Stack>
+            </AccordionSummary>
+            <AccordionDetails>
+                <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
+            </AccordionDetails>
+        </Accordion>
+    );
+}
+
 function CriteriaList() {
-    const { criterias } = useSelector((state) => state.criteria);
+    const { meeting } = useSelector((state) => state.meeting);
 
     let content;
 
-    if (criterias.length === 0) {
-        content = null;
+    if (meeting === null) {
+        content = [0, 1, 2, 3, 4].map((item) => (
+            <CriteriaLoading key={item} item={item} />
+        ));
     } else {
-        content = criterias.map((criteria) => (
-            <Criteria key={criteria.id} criteria={criteria} />
+        content = meeting.criteria.map((critique) => (
+            <Criteria key={critique.id} criteria={critique} />
         ));
     }
 

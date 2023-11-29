@@ -50,10 +50,13 @@ let CourseLoadingButton = () => {
 
 function CoursesList(props) {
     const { open } = props;
+
+    // Retrieve Courses from store
     const { courses } = useSelector((state) => state.course);
 
     let content;
 
+    // If courses is empty then use CourseLoadingButton else use CourseButton component
     if (courses.length === 0) {
     // if (true) {
         content = [1, 2, 3, 4, 5, 6, 7, 8].map((item) => (

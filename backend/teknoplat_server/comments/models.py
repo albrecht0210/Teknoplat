@@ -6,7 +6,7 @@ Account = get_user_model()
 # Create your models here.
 class Comment(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    meeting = models.ForeignKey('meetings.Meeting', on_delete=models.CASCADE)
+    # meeting = models.ForeignKey('meetings.Meeting', on_delete=models.CASCADE)
 
     comment = models.TextField()
 

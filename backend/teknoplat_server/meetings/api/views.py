@@ -16,6 +16,9 @@ from pitches.api.serializers import PitchSerializer
 from criteria.models import Criteria, MeetingCriteria
 from criteria.api.serializers import MeetingCriteriaSerializer
 
+from comments.models import Comment
+from comments.api.serializers import CommentSerializer
+
 class MeetingCreateAPIView(generics.CreateAPIView):
     serializer_class = CreateMeetingSerializer
     permission_classes = (permissions.IsAuthenticated, IsTeacherUserOrReadOnly, )
@@ -69,7 +72,6 @@ class MeetingCreateAPIView(generics.CreateAPIView):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-
 class MeetingViewSet(viewsets.ModelViewSet):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
@@ -88,6 +90,29 @@ class MeetingViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(status=status_param)
 
         return queryset
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        meeting_data = []
+        for meeting in queryset:
+            presentors = meeting.presentors.all()
+            criterias = MeetingCriteria.objects.filter(meeting=meeting)
+            comments = meeting.comments.all()
+
+            presentors_serializer = PitchSerializer(presentors, many=True)
+            criteria_serializer = MeetingCriteriaSerializer(criterias, many=True)
+            comment_serializer = CommentSerializer(comments, many=True)
+
+            meeting_serializer = self.get_serializer(meeting)
+            meeting = meeting_serializer.data
+
+            meeting['pitches'] = presentors_serializer.data
+            meeting['criteria'] = criteria_serializer.data
+            meeting['comments'] = comment_serializer.data
+            meeting_data.append(meeting)
+
+        return Response(meeting_data, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'])
     def add_meeting_presentor(self, request, pk=None):
@@ -160,7 +185,34 @@ class MeetingViewSet(viewsets.ModelViewSet):
         if not criterias.exists():
             return Response({'error': 'No criteria found for the meeting.'}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = MeetingCriteriaSerializer(criterias, many=True)  # Assuming you have a PitchSerializer
+        serializer = MeetingCriteriaSerializer(criterias, many=True) 
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'])
+    def add_meeting_comment(self, request, pk=None):
+        meeting = self.get_object()  # Get the Meeting instance
+
+        if meeting is None:
+            return Response({'error': 'Meeting not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        comment_serializer = CommentSerializer(data=request.data)
+
+        if comment_serializer.is_valid(): 
+            comment_serializer.save()
+            return Response(comment_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=True, methods=['get'])
+    def get_meeting_comments(self, request, pk=None):
+        meeting = self.get_object()
+        
+        if meeting is None:
+            return Response({'error': 'Meeting not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        comments = meeting.comments.all()
+
+        serializer = CommentSerializer(comments, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
     

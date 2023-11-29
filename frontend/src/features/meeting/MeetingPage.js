@@ -6,6 +6,7 @@ import TabPanel from "../../components/tab/TabPanel";
 import ParticipantList from "./ParticipantList";
 import PitchList from "./PitchList";
 import CriteriaList from "./CriteriaList";
+import CommentCard from "./CommentCard";
 
 let MeetingDetail = ({ meeting, tabOptions, handleChange, value }) => {
     let actionButton;
@@ -37,7 +38,7 @@ let MeetingDetail = ({ meeting, tabOptions, handleChange, value }) => {
                     selected={value}
                     name="Pitch"
                     value={0}
-                    height="100%"
+                    height="calc(100% - 65.5px - 65.5px - 65.5px)"
                 >
                     <PitchList />
                 </TabPanel>
@@ -45,7 +46,7 @@ let MeetingDetail = ({ meeting, tabOptions, handleChange, value }) => {
                     selected={value}
                     name="Criteria"
                     value={1}
-                    height="100%"
+                    height="calc(100% - 65.5px - 65.5px - 65.5px)"
                 >
                     <CriteriaList />
                 </TabPanel>
@@ -53,9 +54,9 @@ let MeetingDetail = ({ meeting, tabOptions, handleChange, value }) => {
                     selected={value}
                     name="Comment"
                     value={2}
-                    height="100%"
+                    height="calc((((100% - 65.5px) - 65.5px) - 65.5px ) - 65.5px)"
                 >
-                    <Typography>Option 3</Typography>
+                    <CommentCard />
                 </TabPanel>
             </Grid>
             <Grid item sm={12} md={4}>
@@ -94,25 +95,25 @@ let MeetingDetailLoading = ({ tabOptions, handleChange, value }) => {
                     selected={value}
                     name="Pitch"
                     value={0}
-                    height="calc(100% - 48px - 124.5px - 25px)"
+                    height="calc(100% - 65.5px - 65.5px - 65.5px)"
                 >
-                    <Typography>Option 1</Typography>
+                    <PitchList />
                 </TabPanel>
                 <TabPanel
                     selected={value}
                     name="Criteria"
                     value={1}
-                    height="100%"
+                    height="calc(100% - 65.5px - 65.5px - 65.5px)"
                 >
-                    <Typography>Option 2</Typography>
+                    <CriteriaList />
                 </TabPanel>
                 <TabPanel
                     selected={value}
                     name="Comment"
                     value={2}
-                    height="100%"
+                    height="calc((((100% - 65.5px) - 65.5px) - 65.5px ) - 65.5px)"
                 >
-                    <Typography>Option 3</Typography>
+                    <CommentCard />
                 </TabPanel>
             </Grid>
             <Grid item sm={12} md={4}>
@@ -141,12 +142,9 @@ function MeetingPage() {
 
     if (meeting === null) {
         content = <MeetingDetailLoading tabOptions={tabOptions} handleChange={handleTabChange} value={tabValue} />;
-    } else {
+    }  else {
         content = <MeetingDetail meeting={meeting} tabOptions={tabOptions} handleChange={handleTabChange} value={tabValue} />;
     }
-
-
-    
 
     return (
         <Box height="calc(100% - (64px + 50px))">

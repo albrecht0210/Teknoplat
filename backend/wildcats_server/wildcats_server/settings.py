@@ -152,10 +152,15 @@ if (not os.path.exists(JWT_PRIVATE_KEY_PATH)) or (not os.path.exists(JWT_PUBLIC_
     if not os.path.exists(CONFIG_DIR):
         os.makedirs(CONFIG_DIR)
 
+    # hex_string = "16af5ce994c657c13e80ec4aba564949f11d1ea267b941973187ecc0766a0bb8"
+
+    # seed_bytes = bytes.fromhex(hex_string)
+
     private_key = rsa.generate_private_key(
+
         public_exponent=65537,
         key_size=4096,
-        backend=default_backend()
+        backend=default_backend(),
     )
     pem = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,

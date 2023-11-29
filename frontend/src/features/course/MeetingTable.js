@@ -7,11 +7,12 @@ import { formatStringToUrl } from "../../utils/helper";
 import { storeMeetingPaths } from "../data/pathSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 
+// Meeting Row Data
 let MeetingRow = ({ meeting }) => {
     const dispatch = useDispatch();
-    const location = useLocation();
     const navigate = useNavigate();
 
+    const location = useLocation();
     const currentUrl = location.pathname;
 
     const handleMeetingClick = (meeting) => {
@@ -38,6 +39,7 @@ let MeetingRow = ({ meeting }) => {
     )
 }
 
+// Meeting Row Loading
 let MeetingLoadingRow = () => {
     return (
         <TableRow>
@@ -71,19 +73,24 @@ let MeetingLoadingRow = () => {
 
 function MeetingTable(props) {
     const { search, status } = props;
+
+    // Retrieve course from store
     const { course } = useSelector((state) => state.course);
 
+    // Fetch Meetings via course and status
     const { data: meetings = [], isSuccess, refetch } = useGetMeetingsByCourseAndStatusQuery({ course: course?.id, status: status });
 
     const dispatch = useDispatch();
 
     useEffect(() => {
+        // If course is not null then refetch meetings
         if (course !== null) {
             refetch();
         }
     }, [refetch, course]);
 
     useEffect(() => {
+        // If success in fetching meetings then store to meetings and store to meeting paths
         if (isSuccess) {
             dispatch(storeMeetings({ meetings: meetings }));
             
@@ -101,6 +108,7 @@ function MeetingTable(props) {
 
     let content;
 
+    // If meeting is empty then use MeetingLoadingRow component else use the MeetingRow with filtered with search input
     if (meetings.length === 0) {
     // if (true) {
         content = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
@@ -108,7 +116,6 @@ function MeetingTable(props) {
         ));
     } else {
         content = meetings
-            .filter((meeting) => meeting.status === status)
             .filter((meeting) => meeting.name.toLowerCase().includes(search.toLowerCase()))
             .map((meeting) => (
                 <MeetingRow meeting={meeting} key={meeting.id} />

@@ -7,7 +7,9 @@ import { deStoreAuthCredentials, storeAccessToken } from "../features/data/authS
 import { storeProfile } from "../features/data/accountSlice";
 
 function AuthenticatedLayout() {
+    // Fetch Profile
     const { data: profile, isSuccess, isError, refetch } = useGetProfileQuery();
+    // Reauthenticate using refresh
     const [reauthenticate] = useReauthenticateMutation();
 
     const dispatch = useDispatch();
@@ -30,12 +32,14 @@ function AuthenticatedLayout() {
                 });
         }
 
+        // If Error in fetching profile, reauthenticate
         if (isError) {
             reauthCallback();
         }
     }, [dispatch, refetch, navigate, reauthenticate, isError]);
 
     useEffect(() => {
+        // If Succes in fetching profile, store to profile
         if (isSuccess) {
             dispatch(storeProfile({ profile: profile }));
         }

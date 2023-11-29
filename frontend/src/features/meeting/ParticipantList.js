@@ -63,7 +63,7 @@ function ParticipantList() {
     }
 
     return (
-        <Paper sx={{ height: "100%" }}>
+        <Paper sx={{ height: "calc(100vh - 64px - 50px)" }}>
             <List>
                 { content }
             </List>

@@ -11,7 +11,7 @@ function TabPanel(props) {
             aria-labelledby={`${name}-tab`}
             style={{ height: height }}
         >
-            <Box sx={{ p: 3, height: "100%" }}>
+            <Box sx={{ p: 3, height: "100%", pb: 0 }}>
                 { children }
             </Box>
         </div>

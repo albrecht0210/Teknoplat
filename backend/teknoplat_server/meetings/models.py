@@ -29,6 +29,7 @@ class Meeting(models.Model):
     course = models.PositiveBigIntegerField()
 
     presentors = models.ManyToManyField('pitches.Pitch')
+    comments = models.ManyToManyField('comments.Comment')
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
     
     # criterias = models.ManyToManyField('criterias.Criteria', through='criterias.MeetingCriteria')

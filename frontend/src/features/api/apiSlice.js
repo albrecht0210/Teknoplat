@@ -59,10 +59,13 @@ export const apiSlice = createApi({
         getMeetingCriteria: builder.query({
             query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/get_meeting_criteria/`
         }),
-        getPitchTeam: builder.query({
+        getMeetingComments: builder.query({
+            query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/get_meeting_comments/`
+        }),
+        getTeamsForPitch: builder.query({
             query: (payload) => `http://localhost:8008/api/pitches/${payload.id}/get_team/`
         }),
-        getPitchTeamMembers: builder.query({
+        getMembersForTeam: builder.query({
             query: (payload) => `http://localhost:8008/api/pitches/${payload.id}/get_team_members/`
         }),
     })
@@ -85,6 +88,7 @@ export const {
     useGetMeetingQuery, 
     useGetMeetingPitchesQuery,
     useGetMeetingCriteriaQuery,
-    useGetPitchTeamQuery,
-    useGetPitchTeamMembersQuery,
+    useGetMeetingCommentsQuery,
+    useGetTeamsForPitchQuery,
+    useGetMembersForTeamQuery,
 } = apiSlice;
