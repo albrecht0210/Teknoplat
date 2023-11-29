@@ -28,6 +28,9 @@ export const apiSlice = createApi({
                 body: payload.credentials
             }),
         }),
+        authenticateVideoMeeting: builder.query({
+            query: () => `http://localhost:8000/api/token/video/`,
+        }),
         getProfile: builder.query({
             query: () => `http://localhost:8000/api/account/profile/`
         }),
@@ -68,6 +71,27 @@ export const apiSlice = createApi({
         getMembersForTeam: builder.query({
             query: (payload) => `http://localhost:8008/api/pitches/${payload.id}/get_team_members/`
         }),
+        updateMeeting: builder.mutation({
+            query: (payload) => ({
+                url: `http://localhost:8008/api/meetings/${payload.id}/`,
+                method: 'PUT',
+                body: payload.meeting
+            }),
+        }),
+        createVideoMeeting: builder.mutation({
+            query: (payload) => ({
+                url: `http://localhost:8008/api/meeting/create-meeting/`,
+                method: 'POST',
+                body: payload.credentials
+            }),
+        }),
+        validateVideoMeeting: builder.mutation({
+            query: (payload) => ({
+                url: `http://localhost:8008/api/meeting/validate-meeting/${payload.video}/`,
+                method: 'POST',
+                body: payload.credentials
+            }),
+        })
     })
 });
 
@@ -76,6 +100,7 @@ export const {
     useAuthenticateMutation,
     useReauthenticateMutation,
     useGetProfileQuery,
+    useAuthenticateVideoMeetingQuery,
 
     // Team Management Server
     useGetAccountCoursesQuery,
@@ -91,4 +116,7 @@ export const {
     useGetMeetingCommentsQuery,
     useGetTeamsForPitchQuery,
     useGetMembersForTeamQuery,
+    useCreateVideoMeetingMutation,
+    useValidateVideoMeetingMutation,
+    useUpdateMeetingMutation,
 } = apiSlice;

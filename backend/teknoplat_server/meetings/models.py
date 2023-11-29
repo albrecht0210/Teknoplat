@@ -31,7 +31,7 @@ class Meeting(models.Model):
     presentors = models.ManyToManyField('pitches.Pitch')
     comments = models.ManyToManyField('comments.Comment')
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
-    
+    video = models.CharField(max_length=50, blank=True, null=True)
     # criterias = models.ManyToManyField('criterias.Criteria', through='criterias.MeetingCriteria')
 
     created_at = models.DateTimeField(auto_now_add=True) 

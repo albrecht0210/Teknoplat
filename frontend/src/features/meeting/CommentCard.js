@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 
 function CommentCard () {
     const { meetings } = useSelector((state) => state.meeting);
+    const { members } = useSelector((state) => state.course);
     const { profile } = useSelector((state) => state.account);
 
     const sampleComments = [

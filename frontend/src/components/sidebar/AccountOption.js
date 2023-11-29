@@ -4,6 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { deStoreAuthCredentials } from "../../features/data/authSlice";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import { deStoreProfile } from "../../features/data/accountSlice";
+import { deStoreCourses } from "../../features/data/courseSlice";
+import { deStoreMeetings } from "../../features/data/meetingSlice";
 
 let AccountButton = ({ profile }) => {
     return (
@@ -85,8 +88,12 @@ function AccountOption(props) {
     const handleLogoutClick = () => {
         Cookies.remove("refresh");
         Cookies.remove("access");
-        dispatch(deStoreAuthCredentials());
+        Cookies.remove("video");
         navigate("/");
+        dispatch(deStoreAuthCredentials());
+        dispatch(deStoreProfile());
+        dispatch(deStoreCourses());
+        dispatch(deStoreMeetings());
     }
 
     return (

@@ -68,7 +68,7 @@ function PitchList() {
             <PitchLoading key={item} item={item} />
         ));
     } else {
-        content = meeting.pitches.map((pitch) => (
+        content = meeting.presentors.map((pitch) => (
             <Pitch key={pitch.id} pitch={pitch} />
         ));
     }

@@ -11,11 +11,8 @@ class WildcatTokenObtainPairSerializer(TokenObtainPairSerializer):
         service_identifiers = [service.identifier for service in user_services]
         
         print(service_identifiers)
-        VIDEOSDK_API_KEY = "fad76f00-2b26-41ae-ab29-698c9d6ca4a1"
 
         token['aud'] = service_identifiers
         token['admin'] = user.is_superuser
-        token['permissions'] = ["allow_join", "allow_mod"],
-        token['apiKey'] = VIDEOSDK_API_KEY
 
         return token 

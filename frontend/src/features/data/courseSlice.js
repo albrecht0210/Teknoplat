@@ -21,8 +21,11 @@ export const courseSlice = createSlice({
             state.members = payload.members;
         },
         deStoreCourses: (state) => {
-            state.courses = [];
-            state.course = null;
+            return {
+                courses: [],
+                course: null,
+                members: []
+            }
         },
         deStoreCourse: (state) => {
             state.course = null;

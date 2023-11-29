@@ -12,6 +12,8 @@ import ErrorPage from "./features/error/ErrorPage";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import MeetingLayout from "./layouts/MeetingLayout";
 import MeetingPage from "./features/meeting/MeetingPage";
+import VideoLayout from "./layouts/VideoLayout";
+import VideoPage from "./features/video/VideoPage";
 
 function UrlPaths() {
     const { access } = useSelector((state) => state.auth);
@@ -54,16 +56,16 @@ function UrlPaths() {
                         }
                     ]
                 },
-                // {
-                //     path: "video_meet/",
-                //     element: <VideoLayout />,
-                //     children: [
-                //         {
-                //             path: ":meeting",
-                //             element: <VideoPage />
-                //         }
-                //     ]
-                // }
+                {
+                    path: "video_meet/",
+                    element: <VideoLayout />,
+                    children: [
+                        {
+                            path: ":meeting",
+                            element: <VideoPage />
+                        }
+                    ]
+                }
             ]
         }
     ];

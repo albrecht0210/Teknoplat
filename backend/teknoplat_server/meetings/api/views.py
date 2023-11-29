@@ -2,7 +2,7 @@ import requests
 import json
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import generics, permissions, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
@@ -16,7 +16,6 @@ from pitches.api.serializers import PitchSerializer
 from criteria.models import Criteria, MeetingCriteria
 from criteria.api.serializers import MeetingCriteriaSerializer
 
-from comments.models import Comment
 from comments.api.serializers import CommentSerializer
 
 class MeetingCreateAPIView(generics.CreateAPIView):
@@ -26,7 +25,7 @@ class MeetingCreateAPIView(generics.CreateAPIView):
     def get_auth_headers(self):
         authorization_header = self.request.META.get('HTTP_AUTHORIZATION', None)
         _, token = authorization_header.split()
-        return {'Authorization': f"Bearer {token}"}
+        return {'Authorization': f'Bearer {token}'}
 
     def has_error_response(self, status_code):
         error_response_map = [500, 400, 401, 403, 404]
@@ -96,23 +95,23 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
         meeting_data = []
         for meeting in queryset:
-            presentors = meeting.presentors.all()
             criterias = MeetingCriteria.objects.filter(meeting=meeting)
-            comments = meeting.comments.all()
-
-            presentors_serializer = PitchSerializer(presentors, many=True)
             criteria_serializer = MeetingCriteriaSerializer(criterias, many=True)
-            comment_serializer = CommentSerializer(comments, many=True)
-
             meeting_serializer = self.get_serializer(meeting)
             meeting = meeting_serializer.data
-
-            meeting['pitches'] = presentors_serializer.data
             meeting['criteria'] = criteria_serializer.data
-            meeting['comments'] = comment_serializer.data
             meeting_data.append(meeting)
 
         return Response(meeting_data, status=status.HTTP_200_OK)
+    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        criterias = MeetingCriteria.objects.filter(meeting=instance)
+        criteria_serializer = MeetingCriteriaSerializer(criterias, many=True)
+        instance_data = self.get_serializer(instance).data
+        instance_data['criteria'] = criteria_serializer.data
+
+        return Response(instance_data, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'])
     def add_meeting_presentor(self, request, pk=None):
@@ -215,4 +214,21 @@ class MeetingViewSet(viewsets.ModelViewSet):
         serializer = CommentSerializer(comments, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+VIDEOSDK_API_ENDPOINT = 'https://api.videosdk.live'
+
+class CreateMeetingView(views.APIView):
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        res = requests.post(VIDEOSDK_API_ENDPOINT + '/api/meetings',
+                            headers={'Authorization': data['token']})
+        return Response(res.json(), status=res.status_code)
+
+class ValidateMeetingView(views.APIView):
+    def post(self, request, video_meeting_id, *args, **kwargs):
+        data = request.data
+        res = requests.post(VIDEOSDK_API_ENDPOINT + f'/api/meetings/{video_meeting_id}',
+                            headers={'Authorization': data['token']})
+        if res.status_code == 400:
+            return Response({ 'error': 'Video ID is not valid.' }, status=res.status_code)
+        return Response(res.json(), status=res.status_code)    

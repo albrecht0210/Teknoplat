@@ -11,6 +11,8 @@ import { storeCoursePaths, storeCurrent } from "../features/data/pathSlice";
 function MainLayout() {
     // Retrieve paths
     const { paths } = useSelector((state) => state.path);
+    // Retrieve access
+    const { access } = useSelector((state) => state.auth);
 
     // Fetch Courses
     const { data: courses = [], isSuccess, isError, refetch } = useGetAccountCoursesQuery();
@@ -53,6 +55,10 @@ function MainLayout() {
             refetch();
         }
     }, [refetch, isError]);
+
+    useEffect(() => {
+        refetch();
+    }, [refetch, access]);
 
     return (
         <Box>

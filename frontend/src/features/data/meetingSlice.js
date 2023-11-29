@@ -20,6 +20,9 @@ export const meetingSlice = createSlice({
         storeMeeting: (state, { payload }) => {
             state.meeting = state.meetings.find((meeting) => meeting.id === payload.meeting.id);
         },
+        storeReplaceMeeting: (state, { payload }) => {
+            state.meeting = payload.meeting;
+        },
         storeMeetingByName: (state, { payload }) => {
             state.meeting = state.meeting.find((meeting) => meeting.name === payload.name);
         },
@@ -44,8 +47,11 @@ export const meetingSlice = createSlice({
             state.status = payload.status;
         },
         deStoreMeetings: (state) => {
-            state.meetings = [];
-            state.meeting = null;
+            return {
+                meetings: [],
+                meeting: null,
+                status: "in_progress",
+            }
         },
         deStoreMeeting: (state) => {
             state.meeting = null;
@@ -57,6 +63,7 @@ export const {
     storeMeetings,
     storeMeetingsOnCourse,
     storeMeeting,
+    storeReplaceMeeting,
     storeMeetingByName,
     storeMeetingPitchTeam,
     storeMeetingPitchTeamMembers,
