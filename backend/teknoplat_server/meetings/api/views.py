@@ -1,3 +1,4 @@
+import datetime
 import requests
 import json
 from channels.layers import get_channel_layer
@@ -214,21 +215,3 @@ class MeetingViewSet(viewsets.ModelViewSet):
         serializer = CommentSerializer(comments, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-VIDEOSDK_API_ENDPOINT = 'https://api.videosdk.live'
-
-class CreateMeetingView(views.APIView):
-    def post(self, request, *args, **kwargs):
-        data = request.data
-        res = requests.post(VIDEOSDK_API_ENDPOINT + '/api/meetings',
-                            headers={'Authorization': data['token']})
-        return Response(res.json(), status=res.status_code)
-
-class ValidateMeetingView(views.APIView):
-    def post(self, request, video_meeting_id, *args, **kwargs):
-        data = request.data
-        res = requests.post(VIDEOSDK_API_ENDPOINT + f'/api/meetings/{video_meeting_id}',
-                            headers={'Authorization': data['token']})
-        if res.status_code == 400:
-            return Response({ 'error': 'Video ID is not valid.' }, status=res.status_code)
-        return Response(res.json(), status=res.status_code)    
