@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { useAuthenticateVideoMeetingQuery, useGetProfileQuery, useReauthenticateMutation } from "../features/api/apiSlice";
+import { useAuthenticateVideoMeetingMutation, useGetProfileQuery, useReauthenticateMutation } from "../features/api/apiSlice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
@@ -10,55 +10,48 @@ function AuthenticatedLayout() {
     // Retrieve Auth
     const { access } = useSelector((state) => state.auth);
     // Fetch Profile
-    const { data: profile, isSuccess: fetchProfileSuccess, isError, refetch: refetchProfile } = useGetProfileQuery();
-    const { data: token, isSuccess: fetchTokenSuccess, refetch: refetchToken } = useAuthenticateVideoMeetingQuery();
+    const { data: profile, isSuccess, isError, refetch } = useGetProfileQuery();
+
     // Reauthenticate using refresh
     const [reauthenticate] = useReauthenticateMutation();
+    
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
         const reauthCallback = async () => {
             const data = { credentials: { refresh: Cookies.get("refresh") } }
-            await reauthenticate(data).unwrap()
-                .then((payload) => {
-                    Cookies.set("access", payload.access);
-                    dispatch(storeAccessToken(payload));
-                    refetchProfile();
-                })
-                .catch((error) => {
-                    Cookies.remove("access");
-                    Cookies.remove("refresh"); 
-                    Cookies.remove("video"); 
-                    dispatch(deStoreAuthCredentials());
-                    navigate("/");
-                });
+            try {
+                const reAuthPayload = await reauthenticate(data).unwrap();
+                Cookies.set("access", reAuthPayload.access);
+
+                dispatch(storeAccessToken(reAuthPayload));
+
+                refetch();
+            } catch {
+                Cookies.remove("access");
+                Cookies.remove("refresh"); 
+                Cookies.remove("video"); 
+
+                dispatch(deStoreAuthCredentials());
+
+                navigate("/");
+                navigate(0);
+            }
         }
 
         // If Error in fetching profile, reauthenticate
         if (isError) {
             reauthCallback();
         }
-    }, [dispatch, refetchProfile, navigate, reauthenticate, isError]);
+    }, [dispatch, refetch, navigate, reauthenticate, isError]);
 
     useEffect(() => {
         // If Succes in fetching profile, store to profile
-        if (fetchProfileSuccess) {
+        if (isSuccess) {
             dispatch(storeProfile({ profile: profile }));
         }
-    }, [dispatch, profile, fetchProfileSuccess]);
-
-    useEffect(() => {
-        // If success in fetching token, store to video
-        if (fetchTokenSuccess) {
-            dispatch(storeVideoToken({ video: token }));
-        }
-    }, [dispatch, token, fetchTokenSuccess]);
-
-    useEffect(() => {
-        refetchProfile();
-        refetchToken();
-    }, [refetchProfile, refetchToken, access]);
+    }, [dispatch, profile, isSuccess]);
 
     return (
         <Outlet />

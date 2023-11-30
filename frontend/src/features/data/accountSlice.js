@@ -1,17 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialState = {
+    profile: null
+}
+
 export const accountSlice = createSlice({
     name: "account",
-    initialState: {
-        profile: null
-    },
+    initialState: initialState,
     reducers: {
         storeProfile: (state, { payload }) => {
             state.profile = payload.profile;
         },
-        deStoreProfile: (state) => {
-            state.profile = null;
-        }
+        deStoreAccounnt: () => initialState
     }
 });
 

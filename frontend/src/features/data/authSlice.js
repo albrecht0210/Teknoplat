@@ -1,17 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 
-const access = Cookies.get("access") ? Cookies.get("access") : null;
-const refresh = Cookies.get("refresh") ? Cookies.get("refresh") : null;
-const video = Cookies.get("video") ? Cookies.get("video") : null;
+const initialState = {
+    access: Cookies.get("access") ?? null,
+    refresh: Cookies.get("refresh") ?? null,
+    video: Cookies.get("video") ?? null,
+}
 
 export const authSlice = createSlice({
     name: "auth",
-    initialState: {
-        access: access,
-        refresh: refresh,
-        video: video,
-    },
+    initialState: initialState,
     reducers: {
         storeAuthCredentials: (state, { payload }) => {
             state.access = payload.access;
@@ -23,13 +21,7 @@ export const authSlice = createSlice({
         storeAccessToken: (state, { payload }) => {
             state.access = payload.access;
         },
-        deStoreAuthCredentials: (state) => {
-            return {
-                access: access,
-                refresh: refresh,
-                video: video,
-            }
-        }
+        deStoreAuthCredentials: () => initialState
     }
 });
 

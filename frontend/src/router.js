@@ -2,16 +2,16 @@ import { useSelector } from "react-redux";
 import NotAuthenticatedLayout from "./layouts/NotAuthenticatedLayout";
 import AuthenticatedLayout from "./layouts/AuthenticatedLayout";
 import MainLayout from "./layouts/MainLayout";
-import CourseLayout from "./layouts/CourseLayout";
+// import CourseLayout from "./layouts/CourseLayout";
 
 import LoginPage from "./features/login/LoginPage";
 import DashboardPage from "./features/dashboard/DashboardPage";
-import CoursePage from "./features/course/CoursePage";
+// import CoursePage from "./features/course/CoursePage";
 import ErrorPage from "./features/error/ErrorPage";
 
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import MeetingLayout from "./layouts/MeetingLayout";
-import MeetingPage from "./features/meeting/MeetingPage";
+// import MeetingLayout from "./layouts/MeetingLayout";
+// import MeetingPage from "./features/meeting/MeetingPage";
 import VideoLayout from "./layouts/VideoLayout";
 import VideoPage from "./features/video/VideoPage";
 
@@ -32,28 +32,28 @@ function UrlPaths() {
                             path: "",
                             element: <DashboardPage />
                         },
-                        {
-                            path: "courses/",
-                            element: <CourseLayout />,
-                            children: [
-                                {
-                                    path: ":course/",
-                                    element: <CoursePage />,
-                                    children: [
-                                        {
-                                            path: "meetings/",
-                                            element: <MeetingLayout />,
-                                            children: [
-                                                {
-                                                    path: ":meeting/",
-                                                    element: <MeetingPage />
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
+                        // {
+                        //     path: "courses/",
+                        //     element: <CourseLayout />,
+                        //     children: [
+                        //         {
+                        //             path: ":course/",
+                        //             element: <CoursePage />,
+                        //             children: [
+                        //                 {
+                        //                     path: "meetings/",
+                        //                     element: <MeetingLayout />,
+                        //                     children: [
+                        //                         {
+                        //                             path: ":meeting/",
+                        //                             element: <MeetingPage />
+                        //                         }
+                        //                     ]
+                        //                 }
+                        //             ]
+                        //         }
+                        //     ]
+                        // }
                     ]
                 },
                 {

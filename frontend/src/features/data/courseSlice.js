@@ -1,34 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialState = {
+    courses: [],
+    course: null,
+
+}
+
 export const courseSlice = createSlice({
     name: "course",
-    initialState: {
-        courses: [],
-        course: null,
-        members: []
-    },
+    initialState: initialState,
     reducers: {
         storeCourses: (state, { payload }) => {
             state.courses = payload.courses;
         },
         storeCourse: (state, { payload }) => {
-            state.course = state.courses.find((course) => course.id === payload.course.id);
+            state.course = payload.course;
         },
-        storeCourseByName: (state, { payload }) => {
-            state.course = state.courses.find((course) => course.name === payload.name);
-        },
-        storeCourseMembers: (state, { payload }) => {
-            state.members = payload.members;
-        },
-        deStoreCourses: (state) => {
-            return {
-                courses: [],
-                course: null,
-                members: []
-            }
-        },
+        deStoreCourses: () => initialState,
         deStoreCourse: (state) => {
-            state.course = null;
+            state.course = initialState.course
         }
     }
 });
@@ -36,8 +26,6 @@ export const courseSlice = createSlice({
 export const {
     storeCourses,
     storeCourse,
-    storeCourseByName,
-    storeCourseMembers,
     deStoreCourses,
     deStoreCourse
 } = courseSlice.actions;

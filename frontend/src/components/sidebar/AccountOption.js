@@ -89,11 +89,8 @@ function AccountOption(props) {
         Cookies.remove("refresh");
         Cookies.remove("access");
         Cookies.remove("video");
-        navigate("/");
-        dispatch(deStoreAuthCredentials());
-        dispatch(deStoreProfile());
-        dispatch(deStoreCourses());
-        dispatch(deStoreMeetings());
+        navigate("/", { replace: true });
+        navigate(0);
     }
 
     return (

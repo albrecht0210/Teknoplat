@@ -1,0 +1,8 @@
+To Do:
+
+1. End call should leave the meeting on all participants
+2. Reload Works
+3. Fix Panel Transition
+4. Rate Panel Functionality
+5. Icon Button (Controls) should change depending on state
+6. On logout refresh - Done

@@ -2,11 +2,11 @@ import { Box, Toolbar } from "@mui/material";
 import Sidebar from "../components/sidebar/Sidebar";
 import AuthNavbar from "../components/navbar/AuthNavbar";
 import { Outlet, useLocation } from "react-router-dom";
-import { useGetAccountCoursesQuery } from "../features/api/apiSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { storeCourses } from "../features/data/courseSlice";
 import { storeCoursePaths, storeCurrent } from "../features/data/pathSlice";
+import { useGetAccountCoursesQuery } from "../features/api/apiSlice";
 
 function MainLayout() {
     // Retrieve paths
@@ -15,7 +15,7 @@ function MainLayout() {
     const { access } = useSelector((state) => state.auth);
 
     // Fetch Courses
-    const { data: courses = [], isSuccess, isError, refetch } = useGetAccountCoursesQuery();
+    const { data: courses = [], isSuccess, refetch } = useGetAccountCoursesQuery();
     
     const location = useLocation();
     const dispatch = useDispatch();
@@ -48,13 +48,6 @@ function MainLayout() {
             dispatch(storeCurrent({ url: currentUrl }));
         }
     }, [dispatch, courses, isSuccess, currentUrl, paths]);
-
-    useEffect(() => {
-        // If Error in fetching courses, refetch
-        if (isError) {
-            refetch();
-        }
-    }, [refetch, isError]);
 
     useEffect(() => {
         refetch();

@@ -1,13 +1,13 @@
 import { useSnackbar } from "notistack";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useAuthenticateMutation } from "../api/apiSlice";
+import { useAuthenticateMutation, useAuthenticateVideoMeetingMutation } from "../api/apiSlice";
 import { useState } from "react";
 import { Card, CardContent, Stack, Typography } from "@mui/material";
 import LoginInput from "./LoginInput";
 import LoginButton from "./LoginButton";
 import Cookies from "js-cookie";
-import { storeAuthCredentials } from "../data/authSlice";
+import { storeAuthCredentials, storeVideoToken } from "../data/authSlice";
 
 function LoginCard() {
     const { enqueueSnackbar } = useSnackbar();
@@ -16,6 +16,7 @@ function LoginCard() {
     const navigate = useNavigate();
 
     const [authenticate, { isLoading }] = useAuthenticateMutation();
+    const [authenticateVideoMeeting] = useAuthenticateVideoMeetingMutation();
 
     const [formData, setFormData] = useState({
         username: "",
@@ -36,26 +37,33 @@ function LoginCard() {
     const handleOnFormSubmit = async (e) => {
         e.preventDefault();
 
-        if (canSave) {
+        if (!canSave) {
+            return;
+        }
+
+        try {
             const data = { credentials: { username: formData.username, password: formData.password } };
-            await authenticate(data).unwrap()
-                .then((payload) => {
-                    Cookies.set("access", payload.access);
-                    Cookies.set("refresh", payload.refresh);
+            const authPayload = await authenticate(data).unwrap();
 
-                    dispatch(storeAuthCredentials(payload));
-                    navigate("/");
-                })
-                .catch((error) => {
-                    const errorMessage = "detail" in error.data ? error.data.detail : "";
+            Cookies.set("access", authPayload.access);
+            Cookies.set("refresh", authPayload.refresh);
 
-                    enqueueSnackbar(errorMessage, { variant: 'error' });
-                    
-                    setFormData((previousFormData) => ({
-                        ...previousFormData,
-                        password: ""
-                    }));
-                });
+            dispatch(storeAuthCredentials(authPayload));
+
+            const videoPayload = await authenticateVideoMeeting().unwrap();
+            
+            Cookies.set("video", videoPayload.token);
+            dispatch(storeVideoToken({ video: videoPayload.token }));
+
+            navigate("/", { replace: true });
+        } catch(error) {
+            const errorMessage = "detail" in error.data ? error.data.detail : "";
+            enqueueSnackbar(errorMessage, { variant: 'error' });
+    
+            setFormData((previousFormData) => ({
+                ...previousFormData,
+                password: ""
+            }));
         }
     }
 

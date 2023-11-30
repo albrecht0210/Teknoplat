@@ -14,6 +14,8 @@ export const apiSlice = createApi({
     }),
     endpoints: (builder) => ({
         // Wildcat Server
+
+        // Authentication API
         authenticate: builder.mutation({
             query: (payload) => ({
                 url: `http://localhost:8000/api/token/`,
@@ -28,56 +30,107 @@ export const apiSlice = createApi({
                 body: payload.credentials
             }),
         }),
-        authenticateVideoMeeting: builder.query({
-            query: () => `http://localhost:8000/api/token/video/`,
-        }),
+        
+
+        // Profile API
         getProfile: builder.query({
             query: () => `http://localhost:8000/api/account/profile/`
         }),
         
         // Team Management Server
+        
+        // Courses API
         getAccountCourses: builder.query({
             query: () => `http://localhost:8080/api/account/profile/courses/`
         }),
-        getCourseDetail: builder.query({
-            query: (payload) => `http://localhost:8080/api/courses/${payload.id}/`
-        }),
-        getCourseMembers: builder.query({
-            query: (payload) => `http://localhost:8080/api/courses/${payload.id}/get_course_members/`
+        
+        // Team API
+        getTeamDetail: builder.query({
+            query: (payload) => `http://localhost:8080/api/teams/${payload.id}/`
         }),
 
         // Teknoplat Server
+
+        // Meetings API
         getMeetingsByCourse: builder.query({
             query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}`
         }),
         getMeetingsByCourseAndStatus: builder.query({
             query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}&status=${payload.status}`
         }),
-        getMeeting: builder.query({
+
+        // Meeting API
+        getMeetingDetail: builder.query({
             query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/`
         }),
-        getMeetingPitches: builder.query({
-            query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/get_meeting_presentors/`
-        }),
-        getMeetingCriteria: builder.query({
-            query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/get_meeting_criteria/`
-        }),
-        getMeetingComments: builder.query({
-            query: (payload) => `http://localhost:8008/api/meetings/${payload.id}/get_meeting_comments/`
-        }),
-        getTeamsForPitch: builder.query({
-            query: (payload) => `http://localhost:8008/api/pitches/${payload.id}/get_team/`
-        }),
-        getMembersForTeam: builder.query({
-            query: (payload) => `http://localhost:8008/api/pitches/${payload.id}/get_team_members/`
-        }),
-        updateMeeting: builder.mutation({
+        updateMeetingDetail: builder.mutation({
             query: (payload) => ({
                 url: `http://localhost:8008/api/meetings/${payload.id}/`,
                 method: 'PUT',
                 body: payload.meeting
             }),
         }),
+        
+        // Comment API
+        addComment: builder.mutation({
+            query: (payload) => ({
+                url: `http://localhost:8008/api/comments/`,
+                method: 'POST',
+                body: payload.comment
+            }),
+        }),
+
+        // Ratings API
+        addRating: builder.mutation({
+            query: (payload) => ({
+                url: `http://localhost:8008/api/account/ratings/`,
+                method: 'POST',
+                body: payload.rating
+            }),
+        }),
+        updateRating: builder.mutation({
+            query: (payload) => ({
+                url: `http://localhost:8008/api/ratings/`,
+                method: 'PUT',
+                body: payload.rating
+            }),
+        }),
+        getRatings: builder.query({
+            query: () => `http://localhost:8008/ratings/`
+        }),
+        getAccountRatings: builder.query({
+            query: () => `http://localhost:8008/account/ratings/`
+        }),
+        getPitchRatings: builder.query({
+            query: () => `http://localhost:8008/pitch/ratings/`
+        }),
+
+        // Remarks API
+        addRemark: builder.mutation({
+            query: (payload) => ({
+                url: `http://localhost:8008/api/account/remarks/`,
+                method: 'POST',
+                body: payload.remark
+            }),
+        }),
+        updateRemark: builder.mutation({
+            query: (payload) => ({
+                url: `http://localhost:8008/api/remarks/`,
+                method: 'PUT',
+                body: payload.remark
+            }),
+        }),
+        getRemarks: builder.query({
+            query: () => `http://localhost:8008/remarks/`
+        }),
+        getAccountRemarks: builder.query({
+            query: () => `http://localhost:8008/account/remarks/`
+        }),
+        getPitchRemarks: builder.query({
+            query: () => `http://localhost:8008/pitch/remarks/`
+        }),
+
+        // Video SDK API
         createVideoMeeting: builder.mutation({
             query: (payload) => ({
                 url: `http://localhost:8008/api/meeting/create-meeting/`,
@@ -91,32 +144,63 @@ export const apiSlice = createApi({
                 method: 'POST',
                 body: payload.credentials
             }),
-        })
+        }),
+        authenticateVideoMeeting: builder.mutation({
+            query: () => ({
+                url: `http://localhost:8008/api/video/authenticate/`,
+                method: 'POST'
+            }),
+        }),
     })
 });
 
 export const {
     // Wildcat Server
+
+    // Authentication API
     useAuthenticateMutation,
     useReauthenticateMutation,
+
+    // Profile API
     useGetProfileQuery,
-    useAuthenticateVideoMeetingQuery,
 
     // Team Management Server
+
+    // Courses API
     useGetAccountCoursesQuery,
-    useGetCourseDetailQuery,
-    useGetCourseMembersQuery,
+
+    // Team API
+    useGetTeamDetailQuery,
 
     // Teknoplat Server
+
+    // Meetings API
     useGetMeetingsByCourseQuery,
     useGetMeetingsByCourseAndStatusQuery,
-    useGetMeetingQuery, 
-    useGetMeetingPitchesQuery,
-    useGetMeetingCriteriaQuery,
-    useGetMeetingCommentsQuery,
-    useGetTeamsForPitchQuery,
-    useGetMembersForTeamQuery,
+
+    // Meeting API
+    useGetMeetingDetailQuery,
+    useUpdateMeetingDetailMutation,
+
+    // Comment API
+    useAddCommentMutation,
+
+    // Ratings API
+    useAddRatingMutation,
+    useUpdateRatingMutation,
+    useGetRatingsQuery,
+    useGetAccountRatingsQuery,
+    useGetPitchRatingsQuery,
+
+    // Remarks API
+    useAddRemarkMutation,
+    useUpdateRemarkMutation,
+    useGetRemarksQuery,
+    useGetAccountRemarksQuery,
+    useGetPitchRemarksQuery,
+
+    // Video SDK API
     useCreateVideoMeetingMutation,
     useValidateVideoMeetingMutation,
-    useUpdateMeetingMutation,
+    useAuthenticateVideoMeetingMutation,
 } = apiSlice;
