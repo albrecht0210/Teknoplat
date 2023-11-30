@@ -25,6 +25,8 @@ urlpatterns = [
     path('api/', include('comments.api.urls')),
     path('api/', include('chats.api.urls')),
     path('api/', include('criteria.api.urls')),
-    path('api/', include('evaluations.api.urls')),
     path('api/', include('feedbacks.api.urls')),
+    path('api/', include('ratings.api.urls')),
+    path('api/', include('remarks.api.urls')),
+    path('api/', include('video.api.urls')),
 ]
