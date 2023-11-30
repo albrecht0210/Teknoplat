@@ -12,6 +12,19 @@ class EvaluationViewSet(viewsets.ModelViewSet):
     serializer_class = EvaluationSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
+    def get_queryset(self):
+        queryset = self.queryset
+        account_param = self.request.query_params.get('account', None)
+        pitch_param = self.request.query_params.get('pitch', None)
+
+        if account_param:
+            queryset = queryset.filter(account=account_param)
+
+        if pitch_param:
+            queryset = queryset.filter(pitch=pitch_param)
+
+        return queryset
+
     @action(detail=True, methods=['post'])
     def add_evaluation_criteria(self, request, pk=None):
         evaluation = self.get_object()

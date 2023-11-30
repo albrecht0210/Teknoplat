@@ -15,7 +15,7 @@ class Evaluation(models.Model):
     
     def __str__(self):
         return self.remark
-    
+
 class EvaluationCriteria(models.Model):
     evaluation = models.ForeignKey(Evaluation, on_delete=models.CASCADE)
     criteria = models.ForeignKey('criteria.Criteria', on_delete=models.CASCADE)
