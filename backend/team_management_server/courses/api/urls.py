@@ -10,7 +10,6 @@ urlpatterns = [
     # Include the router's URL patterns
     path('', include(router.urls)),
     path('courses/<int:pk>/add_course_member/', CourseViewSet.as_view({'post': 'add_course_member'}), name='add-course-member'),
-    path('courses/<int:pk>/get_course_members/', CourseViewSet.as_view({'get': 'get_course_members'}), name='get-course-members'),
     
     path('account/profile/courses/', AccountCourseAPIView.as_view(), name='courses-by-account'),
 ]

@@ -58,22 +58,6 @@ class TeamViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Account is not a member of the course.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': 'An error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    @action(detail=True, methods=['get'])
-    def get_team_members(self, request, pk=None):
-        team = self.get_object()
-
-        if team is None:
-            return Response({'error': 'Team not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        team_members = team.members.all()
-
-        if not team_members.exists():
-            return Response({'message': 'No members found for the team.'}, status=status.HTTP_404_NOT_FOUND)
-
-        account_serializer = AccountSerializer(team_members, many=True)
-
-        return Response(account_serializer.data, status=status.HTTP_200_OK)
     
 class AccountTeamAPIView(generics.ListAPIView):
     serializer_class = TeamSerializer

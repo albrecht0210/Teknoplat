@@ -23,7 +23,6 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         if course is None:
             return Response({'error': 'Course not found.'}, status=status.HTTP_404_NOT_FOUND)
-
         if account_id is None:
             return Response({'error': 'Account username is missing from the request data.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -49,22 +48,6 @@ class CourseViewSet(viewsets.ModelViewSet):
             return Response({"error": "Account not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    @action(detail=True, methods=['get'])
-    def get_course_members(self, request, pk=None):
-        course = self.get_object()
-
-        if course is None:
-            return Response({'error': 'Course not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        course_members = course.members.all()
-
-        if not course_members.exists():
-            return Response({'message': 'No members found for the course.'}, status=status.HTTP_200_OK)
-
-        account_serializer = AccountSerializer(course_members, many=True)
-
-        return Response(account_serializer.data, status=status.HTTP_200_OK)
 
 class AccountCourseAPIView(generics.ListAPIView):
     serializer_class = CourseSerializer

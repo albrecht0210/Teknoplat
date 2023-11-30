@@ -9,8 +9,7 @@ router.register(r'teams', TeamViewSet, basename='team')
 urlpatterns = [
     # Include the router's URL patterns
     path('', include(router.urls)),
-    path('courses/<int:pk>/add_team_member/', TeamViewSet.as_view({'post': 'add_team_member'}), name='add-team-member'),
-    path('courses/<int:pk>/get_team_members/', TeamViewSet.as_view({'get': 'get_team_members'}), name='get-team-members'),
+    path('teams/<int:pk>/add_team_member/', TeamViewSet.as_view({'post': 'add_team_member'}), name='add-team-member'),
     
-    path('account/profile/teams', AccountTeamAPIView.as_view(), name='courses-by-account'),
+    path('account/profile/teams/', AccountTeamAPIView.as_view(), name='teams-by-account'),
 ]
