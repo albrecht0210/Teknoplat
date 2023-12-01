@@ -1,5 +1,5 @@
 import { Logout } from "@mui/icons-material";
-import { Box, Button, IconButton, Stack, Toolbar, Typography } from "@mui/material";
+import { Box, Button, IconButton, Skeleton, Stack, Toolbar, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { deStoreAuthCredentials } from "../../features/data/authSlice";
 import Cookies from "js-cookie";
@@ -32,6 +32,22 @@ let AccountButton = ({ profile }) => {
                     fontSize={10}
                 >
                     { profile.username }
+                </Typography>
+            </Stack>
+        </Button>
+    );
+}
+
+let AccountSkeleton = () => {
+    return (
+        <Button variant="text" sx={{ width: "175px", justifyContent: "flex-start" }}>
+            <Skeleton variant="rounded" width={30} height={30} />
+            <Stack spacing={0}>
+                <Typography component="div" variant="caption" sx={{ width: "calc(240px * .52)" }}>
+                    <Skeleton />
+                </Typography>
+                <Typography component="div" variant="caption" fontSize={10} sx={{ width: "calc(240px * .52) / 2" }}>
+                    <Skeleton />
                 </Typography>
             </Stack>
         </Button>
@@ -80,7 +96,8 @@ function AccountOption(props) {
     // If profile is null then use AccountLoadingButton else use AccountButton component
     if (profile === null) {
     // if (true) {
-        content = <AccountLoadingButton />;
+        content = <AccountSkeleton />;
+        // content = <AccountLoadingButton />;
     } else {
         content = <AccountButton profile={profile} />;
     }
