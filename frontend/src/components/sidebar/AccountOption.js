@@ -1,94 +1,79 @@
 import { Logout } from "@mui/icons-material";
-import { Box, Button, IconButton, Skeleton, Stack, Toolbar, Typography } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
-import { deStoreAuthCredentials } from "../../features/data/authSlice";
+import { Avatar, Button, IconButton, Skeleton, Stack, Toolbar, Typography } from "@mui/material";
+import { useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { deStoreProfile } from "../../features/data/accountSlice";
-import { deStoreCourses } from "../../features/data/courseSlice";
-import { deStoreMeetings } from "../../features/data/meetingSlice";
 
 let AccountButton = ({ profile }) => {
-    return (
-        <Button variant="text" sx={{ width: "175px" }}>
-            <img 
-                // src={ profile.avatar !== null ? profile.avatar : "/sample/default_avatar.png" }
-                src="/sample/default_avatar.png"
-                alt="AccountProfile"
-                style={{ width: "30px", height: "30px", marginRight: "5px", borderRadius: "5px" }}
-            />
-            <Stack spacing={0}>
-                <Typography
-                    variant="caption"
-                    noWrap={true}
-                    sx={{ width: "calc(240px * .52)" }}
-                    textAlign="left"
-                >
-                    { profile.full_name }
-                </Typography>
-                <Typography
-                    variant="caption"
-                    textAlign="left"
-                    fontSize={10}
-                >
-                    { profile.username }
-                </Typography>
-            </Stack>
-        </Button>
-    );
-}
+    const stringAvatar = (name) => {
+        const nameSplit = name.split(' ');
+        return {
+            sx: {
+                bgcolor: "#f6b422",
+                width: 30,
+                height: 30,
+                fontSize: "1rem",
+                fontWeight: "bold",
+            },
+            children: `${nameSplit[0][0]}${nameSplit[nameSplit.length - 1][0]}`,
+        }
+    }
 
-let AccountSkeleton = () => {
     return (
         <Button variant="text" sx={{ width: "175px", justifyContent: "flex-start" }}>
-            <Skeleton variant="rounded" width={30} height={30} />
-            <Stack spacing={0}>
-                <Typography component="div" variant="caption" sx={{ width: "calc(240px * .52)" }}>
-                    <Skeleton />
-                </Typography>
-                <Typography component="div" variant="caption" fontSize={10} sx={{ width: "calc(240px * .52) / 2" }}>
-                    <Skeleton />
-                </Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+                { profile?.avatar !== null ? (
+                    <img 
+                        src={profile?.avatar}
+                        alt="AccountProfile"
+                        style={{ width: "30px", height: "30px" }}
+                    />
+                ) : (
+                    <Avatar {...stringAvatar(profile.full_name)} />
+                )}
+                <Stack spacing={0} width="calc(175px - 54px)">
+                    <Typography
+                        variant="caption"
+                        noWrap={true}
+                        textAlign="left"
+                    >
+                        { profile.full_name }
+                    </Typography>
+                    <Typography
+                        variant="caption"
+                        textAlign="left"
+                        fontSize={10}
+                    >
+                        { profile.username }
+                    </Typography>
+                </Stack>
             </Stack>
         </Button>
     );
 }
 
-let AccountLoadingButton = () => {
+let AccountButtonSkeleton = () => {
     return (
         <Button variant="text" sx={{ width: "175px", justifyContent: "flex-start" }}>
-            <Box
-                style={{ width: "30px", height: "30px", marginRight: "5px", borderRadius: "5px" }}
-                className="loadingSlide"
-            />
-            <Stack spacing={0}>
-                <Typography
-                    variant="caption"
-                    textAlign="left"
-                    sx={{ width: "calc(240px * .52)" }}
-                    className="loadingSlide"
-                >
-                    <span style={{ visibility: "hidden" }}>Loading...</span>
-                </Typography>
-                <Typography
-                    variant="caption"
-                    textAlign="left"
-                    fontSize={10}
-                    sx={{ width: "calc((240px * .52) / 2)" }}
-                    className="loadingSlide"
-                >
-                    <span style={{ visibility: "hidden" }}>Loading...</span>
-                </Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+                <Skeleton variant="circular" animation="wave" width={30} height={30} />
+                <Stack spacing={0} width="calc(175px - 54px)">
+                    <Typography component="div" variant="caption">
+                        <Skeleton animation="wave" />
+                    </Typography>
+                    <Typography component="div" variant="caption" fontSize={10} width="calc(100% / 1.5)">
+                        <Skeleton animation="wave" />
+                    </Typography>
+                </Stack>
             </Stack>
         </Button>
     );
 }
 
-function AccountOption(props) {
+function AccountOption() {
     //  Retrieve profile from store
     const { profile } = useSelector((state) => state.account);
 
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     let content;
@@ -96,8 +81,7 @@ function AccountOption(props) {
     // If profile is null then use AccountLoadingButton else use AccountButton component
     if (profile === null) {
     // if (true) {
-        content = <AccountSkeleton />;
-        // content = <AccountLoadingButton />;
+        content = <AccountButtonSkeleton />;
     } else {
         content = <AccountButton profile={profile} />;
     }
