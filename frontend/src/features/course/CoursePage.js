@@ -7,7 +7,7 @@ import SearchInput from "./SearchInput";
 import TabPanel from "../../components/tab/TabPanel";
 import MeetingTable from "./MeetingTable";
 import { Outlet, useLocation } from "react-router-dom";
-import { useGetMeetingsByCourseQuery } from "../api/apiSlice";
+import { useGetInProgressMeetingsQuery, useGetMeetingsByCourseQuery, useGetPendingMeetingsQuery } from "../api/apiSlice";
 import { storeMeetingPaths } from "../data/pathSlice";
 import { formatStringToUrl } from "../../utils/helper";
 
@@ -50,29 +50,41 @@ let CourseRedirect = ({ currentUrl }) => {
 }
 
 function CoursePage() {
-    // Retrieve status from store
-    const { status } = useSelector((state) => state.meeting);
+    const [statusTabValue, setStatusTabValue] = useState(localStorage.getItem("statusTabValue") ?? 1);
+    const [searchMeeting, setSearchMeeting] = useState(localStorage.getItem("searchMeeting") ?? "");
+    const [rowsPerPage, setRowsPerPage] = useState({
+        pending: localStorage.getItem("rowsPerPagePending") ?? 5,
+        in_progress: localStorage.getItem("rowsPerPageInProgress") ?? 5,
+        completed: localStorage.getItem("rowsPerPageCompleted") ?? 5,
+    });
+
+    const [page, setPage] = useState({
+        pending: localStorage.getItem("pagePending") ?? 0,
+        in_progress: localStorage.getItem("pageInProgress") ?? 0,
+        completed: localStorage.getItem("pageCompleted") ?? 0,
+    });
+
+    const { data: pending_meetings = [] } = useGetPendingMeetingsQuery({ limit: rowsPerPage.pending, offset: (rowsPerPage.pending * (page.pending + 1)) })
+    const { data: in_progress_meetings = [] } = useGetInProgressMeetingsQuery({ limit: rowsPerPage.in_progress, offset: (rowsPerPage.in_progress * (page.in_progress + 1)) })
+    const { data: completed_meetings = [] } = useGetPendingMeetingsQuery({ limit: rowsPerPage.completed, offset: (rowsPerPage.completed * (page.completed + 1)) })
+
+    const tabOptions = [
+        { value: 0, name: "Pending", stringValue: "pending", data: pending_meetings },
+        { value: 1, name: "In Progress", stringValue: "in_progress", data: in_progress_meetings },
+        { value: 2, name: "Completed", stringValue: "completed", data: completed_meetings }
+    ];
 
     const dispatch = useDispatch();
 
     // Retrieve location
     const location = useLocation();
     const currentUrl = location.pathname;
-
-    const tabOptions = [
-        { value: 0, name: "Pending", stringValue: "pending" },
-        { value: 1, name: "In Progress", stringValue: "in_progress" },
-        { value: 2, name: "Completed", stringValue: "completed"}
-    ];
-
-    const initialTabValue = tabOptions.find((option) => option.stringValue === status);
-
-    const [tabValue, setTabValue] = useState(initialTabValue.value);
-    const [search, setSearch] = useState(localStorage.getItem("searchMeeting") ? localStorage.getItem("searchMeeting") : "");
     
     const handleTabChange = (event, value) => {
-        const tabOption = tabOptions.find((option) => option.value === value);
-        dispatch(storeStatus({ status: tabOption.stringValue }));
+        // const tabOption = tabOptions.find((option) => option.value === value);
+        // localStorage(localStorage.setItem("statusTabValue", value));
+        // localStorage.removeItem("rowsPerPage");
+        // localStorage.removeItem("rowsPerPage");
         setTabValue(value);
     }
 
@@ -106,13 +118,11 @@ function CoursePage() {
                     value={option.value}
                     height="calc(100% - 48px)"
                 >
-                    <MeetingTable search={search} status={option.stringValue} />
+                    <MeetingTable meetings={option.data} search={search} />
                 </TabPanel>
             )) }
         </Box>
     );
-
-
 }
 
 export default CoursePage;

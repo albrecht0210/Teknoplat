@@ -1,24 +1,13 @@
-import { Avatar, Collapse, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Skeleton } from "@mui/material";
+import { Collapse, List, ListItem, ListItemButton, ListItemText, Skeleton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { storeCourse } from "../../features/data/courseSlice";
 import { deStoreHistory } from "../../features/data/pathSlice";
+import { useEffect, useState } from "react";
 
 let CourseButton = ({ course }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const stringAvatar = (name) => {
-        const nameSplit = name.split(' ');
-        return {
-            sx: {
-                bgcolor: "#f6b422",
-                fontSize: "1rem",
-                fontWeight: "bold",
-            },
-            children: `${nameSplit[0][0]}${nameSplit[nameSplit.length - 1][0]}`,
-        }
-    }
 
     const handleCourseClick = (course) => {
         dispatch(storeCourse({ course: course }));
@@ -59,15 +48,11 @@ let CourseButtonSkeleton = () => {
 }
 
 function CoursesList(props) {
-    const { open } = props;
-
-    // Retrieve Courses from store
-    const { courses } = useSelector((state) => state.course);
-
+    const { courses, open } = props;
     let content;
 
     // If courses is empty then use CourseLoadingButton else use CourseButton component
-    if (courses.length === 0) {
+    if (courses === null) {
     // if (true) {
         content = [1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
             <CourseButtonSkeleton key={item} />

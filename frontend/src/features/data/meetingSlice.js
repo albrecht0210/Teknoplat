@@ -1,12 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialState = {
+    meetings: [],
+    meeting: null
+}
+
 export const meetingSlice = createSlice({
     name: "meeting",
-    initialState: {
-        meetings: [],
-        meeting: null,
-        status: "in_progress",
-    },
+    initialState: initialState,
     reducers: {
         storeMeetings: (state, { payload }) => {
             return {
@@ -20,39 +21,10 @@ export const meetingSlice = createSlice({
         storeMeeting: (state, { payload }) => {
             state.meeting = state.meetings.find((meeting) => meeting.id === payload.meeting.id);
         },
-        storeReplaceMeeting: (state, { payload }) => {
-            state.meeting = payload.meeting;
-        },
         storeMeetingByName: (state, { payload }) => {
             state.meeting = state.meeting.find((meeting) => meeting.name === payload.name);
         },
-        storeMeetingPitchTeam: (state, { payload }) => {
-            console.log("InTeamPitch:")
-            const index = state.meeting.pitches.findIndex((pitch) => pitch.id === payload.pitch);
-            state.meeting.pitches[index] = {
-                ...state.meeting.pitches[index],
-                team: payload.team
-            }
-        },
-        storeMeetingPitchTeamMembers: (state, { payload }) => {
-            console.log("InTeamPitchMember:")
-            const index = state.meeting.pitches.findIndex((pitch) => pitch.id === payload.pitch);
-            console.log(index);
-            state.meeting.pitches[index] = {
-                ...state.meeting.pitches[index],
-                members: payload.members
-            }
-        },
-        storeStatus: (state, { payload }) => {
-            state.status = payload.status;
-        },
-        deStoreMeetings: (state) => {
-            return {
-                meetings: [],
-                meeting: null,
-                status: "in_progress",
-            }
-        },
+        deStoreMeetings: () => initialState,
         deStoreMeeting: (state) => {
             state.meeting = null;
         }

@@ -2,7 +2,8 @@ import { Logout } from "@mui/icons-material";
 import { Avatar, Button, IconButton, Skeleton, Stack, Toolbar, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate, useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 let AccountButton = ({ profile }) => {
     const stringAvatar = (name) => {
@@ -72,15 +73,23 @@ let AccountButtonSkeleton = () => {
 
 function AccountOption() {
     //  Retrieve profile from store
-    const { profile } = useSelector((state) => state.account);
+    const { profile } = useOutletContext();
+
+    const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     let content;
 
-    // If profile is null then use AccountLoadingButton else use AccountButton component
-    if (profile === null) {
-    // if (true) {
+    if (loading) {
         content = <AccountButtonSkeleton />;
     } else {
         content = <AccountButton profile={profile} />;
@@ -90,8 +99,9 @@ function AccountOption() {
         Cookies.remove("refresh");
         Cookies.remove("access");
         Cookies.remove("video");
-        navigate("/", { replace: true });
-        navigate(0);
+        // navigate(0);
+        // navigate("/login");
+        redirect("/login");
     }
 
     return (

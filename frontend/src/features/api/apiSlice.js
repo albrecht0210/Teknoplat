@@ -46,7 +46,10 @@ export const apiSlice = createApi({
         
         // Team API
         getTeamDetail: builder.query({
-            query: (payload) => `http://localhost:8080/api/teams/${payload.id}/`
+            query: (payload) => `http://localhost:8080/api/teams/${payload.id}/`,
+            forceRefetch({ currentArg, previousArg }) {
+                return currentArg !== previousArg
+            },
         }),
 
         // Teknoplat Server
@@ -55,8 +58,45 @@ export const apiSlice = createApi({
         getMeetingsByCourse: builder.query({
             query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}`
         }),
-        getMeetingsByCourseAndStatus: builder.query({
-            query: (payload) => `http://localhost:8008/api/meetings/?course=${payload.course}&status=${payload.status}`
+        getPendingMeetings: builder.query({
+            query: (payload) => `http://localhost:8008/api/meeting/list/pending/?limit=${payload.limit}&offset=${payload.offset}`,
+            serializeQueryArgs: ({ endpointName }) => {
+                return endpointName
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.push(...newItems)
+            },
+            forceRefetch({ currentArg, previousArg }) {
+                return currentArg !== previousArg
+            },
+        }),
+        getInProgressMeetings: builder.query({
+            query: (payload) => `http://localhost:8008/api/meeting/list/in_progress/?limit=${payload.limit}&offset=${payload.offset}`,
+            serializeQueryArgs: ({ endpointName }) => {
+                return endpointName
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.push(...newItems)
+            },
+            forceRefetch({ currentArg, previousArg }) {
+                return currentArg !== previousArg
+            },
+        }),
+        getCompletedMeetings: builder.query({
+            query: (payload) => `http://localhost:8008/api/meeting/list/completed/?limit=${payload.limit}&offset=${payload.offset}`,
+            serializeQueryArgs: ({ endpointName }) => {
+                return endpointName
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.push(...newItems)
+            },
+            forceRefetch({ currentArg, previousArg }) {
+                console.log("Start Completed Meeting API");
+                console.log(currentArg);
+                console.log(previousArg);
+                console.log("End Completed Meeting API");
+                return currentArg !== previousArg
+            },
         }),
 
         // Meeting API
@@ -176,7 +216,9 @@ export const {
 
     // Meetings API
     useGetMeetingsByCourseQuery,
-    useGetMeetingsByCourseAndStatusQuery,
+    useGetPendingMeetingsQuery,
+    useGetInProgressMeetingsQuery,
+    useGetCompletedMeetingsQuery,
 
     // Meeting API
     useGetMeetingDetailQuery,

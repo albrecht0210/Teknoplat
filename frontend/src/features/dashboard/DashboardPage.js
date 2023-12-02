@@ -1,6 +1,6 @@
 import { Box, Button, Paper, Skeleton, Stack, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { storeCourse } from "../data/courseSlice";
 import { deStoreHistory } from "../data/pathSlice";
 import { storeStatus } from "../data/meetingSlice";
@@ -57,27 +57,29 @@ let DashboardCardSkeleton = () => {
 
 function DashboardPage() {
     // Retrieve courses from store
-    const { courses } = useSelector((state) => state.course);
-
-    let content;
-
+    // const { courses } = useSelector((state) => state.course);
+    const { profile, courses } = useOutletContext();
+    // let content;
+    console.log("Profile: ", profile);
+    console.log("Courses: ", courses);
     // If courses is empty load DashboardLoadingCard else DashboardCard
-    if (courses.length === 0) {
-    // if (true) {
-        content = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
-            <DashboardCardSkeleton key={item} />
-        ));
-    } else {
-        content = courses.map((course) => (
-            <DashboardCard course={course} key={course.id} />
-        ));
-    }
+    // if (courses.length === 0) {
+    // // if (true) {
+    //     content = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
+    //         <DashboardCardSkeleton key={item} />
+    //     ));
+    // } else {
+    //     content = courses.map((course) => (
+    //         <DashboardCard course={course} key={course.id} />
+    //     ));
+    // }
 
     return (
         <Box>
-            <Stack direction="row" spacing={3} useFlexGap flexWrap="wrap">
+            {/* <Stack direction="row" spacing={3} useFlexGap flexWrap="wrap">
                 { content }
-            </Stack>
+            </Stack> */}
+            <Typography>Dashboard</Typography>
         </Box>
     );
 }

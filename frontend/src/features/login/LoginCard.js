@@ -1,27 +1,22 @@
-import { useSnackbar } from "notistack";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { useAuthenticateMutation, useAuthenticateVideoMeetingMutation } from "../api/apiSlice";
+import { Form } from "react-router-dom";
 import { useState } from "react";
 import { Card, CardContent, Stack, Typography } from "@mui/material";
 import LoginInput from "./LoginInput";
 import LoginButton from "./LoginButton";
-import Cookies from "js-cookie";
-import { storeAuthCredentials, storeVideoToken } from "../data/authSlice";
 
-function LoginCard() {
-    const { enqueueSnackbar } = useSnackbar();
+function LoginCard(props) {
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    // const dispatch = useDispatch();
+    // const navigate = useNavigate();
 
-    const [authenticate, { isLoading }] = useAuthenticateMutation();
-    const [authenticateVideoMeeting] = useAuthenticateVideoMeetingMutation();
+    // const [authenticate, { isLoading }] = useAuthenticateMutation();
+    // const [authenticateVideoMeeting] = useAuthenticateVideoMeetingMutation();
 
     const [formData, setFormData] = useState({
         username: "",
         password: ""
     });
+    const [loading, setLoading] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -32,40 +27,43 @@ function LoginCard() {
         }));
     }
 
-    const canSave = [formData.username, formData.password].every(Boolean) && !isLoading;
-
-    const handleOnFormSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!canSave) {
-            return;
-        }
-
-        try {
-            const data = { credentials: { username: formData.username, password: formData.password } };
-            const authPayload = await authenticate(data).unwrap();
-
-            Cookies.set("access", authPayload.access);
-            Cookies.set("refresh", authPayload.refresh);
-
-            dispatch(storeAuthCredentials(authPayload));
-
-            const videoPayload = await authenticateVideoMeeting().unwrap();
-            
-            Cookies.set("video", videoPayload.token);
-            dispatch(storeVideoToken({ video: videoPayload.token }));
-
-            navigate("/", { replace: true });
-        } catch(error) {
-            const errorMessage = "detail" in error.data ? error.data.detail : "";
-            enqueueSnackbar(errorMessage, { variant: 'error' });
-    
-            setFormData((previousFormData) => ({
-                ...previousFormData,
-                password: ""
-            }));
-        }
+    const handleLoginClick = () => {
+        setLoading(true);
     }
+    // const canSave = [formData.username, formData.password].every(Boolean) && !isLoading;
+
+    // const handleOnFormSubmit = async (e) => {
+    //     e.preventDefault();
+
+    //     if (!canSave) {
+    //         return;
+    //     }
+
+    //     try {
+    //         const data = { credentials: { username: formData.username, password: formData.password } };
+    //         const authPayload = await authenticate(data).unwrap();
+
+    //         Cookies.set("access", authPayload.access);
+    //         Cookies.set("refresh", authPayload.refresh);
+
+    //         dispatch(storeAuthCredentials(authPayload));
+
+    //         const videoPayload = await authenticateVideoMeeting().unwrap();
+            
+    //         Cookies.set("video", videoPayload.token);
+    //         dispatch(storeVideoToken({ video: videoPayload.token }));
+
+    //         navigate("/", { replace: true });
+    //     } catch(error) {
+    //         const errorMessage = "detail" in error.data ? error.data.detail : "";
+    //         enqueueSnackbar(errorMessage, { variant: 'error' });
+    
+    //         setFormData((previousFormData) => ({
+    //             ...previousFormData,
+    //             password: ""
+    //         }));
+    //     }
+    // }
 
     return (
         <Card
@@ -76,7 +74,7 @@ function LoginCard() {
             }}
         >
             <CardContent sx={{ p: 3 }}>
-                <form onSubmit={handleOnFormSubmit}>
+                <Form method="post">
                     <Stack spacing={3}>
                         <Typography
                             variant="h6"
@@ -88,18 +86,18 @@ function LoginCard() {
                             name="username"
                             value={formData.username}
                             handleChange={handleInputChange}
-                            disabled={isLoading}
+                            disabled={loading}
                         />
                         <LoginInput
                             name="password"
                             type="password"
                             value={formData.password}
                             handleChange={handleInputChange}
-                            disabled={isLoading}
+                            disabled={loading}
                         />
-                        <LoginButton disabled={isLoading} />
+                        <LoginButton disabled={loading} handleClick={handleLoginClick} />
                     </Stack>
-                </form>
+                </Form>
             </CardContent>
         </Card>
     );
