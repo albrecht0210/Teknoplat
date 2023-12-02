@@ -215,3 +215,21 @@ class MeetingViewSet(viewsets.ModelViewSet):
         serializer = CommentSerializer(comments, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class MeetingPendingAPIView(generics.ListAPIView):
+    queryset = Meeting.objects.filter(status="pending")
+    pagination_class = LimitOffsetPagination
+    serializer_class = MeetingSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+class MeetingInProgressAPIView(generics.ListAPIView):
+    queryset = Meeting.objects.filter(status="in_progress")
+    pagination_class = LimitOffsetPagination
+    serializer_class = MeetingSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+class MeetingCompletedAPIView(generics.ListAPIView):
+    queryset = Meeting.objects.filter(status="completed")
+    pagination_class = LimitOffsetPagination
+    serializer_class = MeetingSerializer
+    permission_classes = (permissions.IsAuthenticated, )

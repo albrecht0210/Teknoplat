@@ -7,7 +7,7 @@ class Pitch(models.Model):
 
     team = models.PositiveBigIntegerField()
     
-    openRate = models.BooleanField(default=False)
+    open_rate = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True) 
     updated_at = models.DateTimeField(auto_now=True)

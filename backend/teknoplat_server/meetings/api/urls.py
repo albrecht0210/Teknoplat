@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import MeetingCreateAPIView, MeetingViewSet
+from .views import MeetingCreateAPIView, MeetingViewSet, MeetingPendingAPIView, MeetingInProgressAPIView, MeetingCompletedAPIView
 
 router = DefaultRouter()
 router.register(r'meetings', MeetingViewSet, basename='meeting')
@@ -18,4 +18,7 @@ urlpatterns = [
     path('meetings/<int:pk>/get_meeting_comments/', MeetingViewSet.as_view({'get': 'get_meeting_comments'}), name='get-meeting-comments'),
 
     path('meeting/create/', MeetingCreateAPIView.as_view(), name='meeting-create'),
+    path('meeting/list/pending/', MeetingPendingAPIView.as_view(), name='meeting-pending-list'),
+    path('meeting/list/in_progress/', MeetingInProgressAPIView.as_view(), name='meeting-inprogress-list'),
+    path('meeting/list/completed/', MeetingCompletedAPIView.as_view(), name='meeting-completed-list'),
 ]
