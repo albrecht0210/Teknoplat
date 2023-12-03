@@ -4,6 +4,7 @@ from .views import MeetingCreateAPIView, MeetingViewSet, MeetingPendingAPIView, 
 
 router = DefaultRouter()
 router.register(r'meetings', MeetingViewSet, basename='meeting')
+router.register(r'meeting/list/pending', MeetingPendingAPIView, basename='meeting-pending')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -18,7 +19,7 @@ urlpatterns = [
     path('meetings/<int:pk>/get_meeting_comments/', MeetingViewSet.as_view({'get': 'get_meeting_comments'}), name='get-meeting-comments'),
 
     path('meeting/create/', MeetingCreateAPIView.as_view(), name='meeting-create'),
-    path('meeting/list/pending/', MeetingPendingAPIView.as_view(), name='meeting-pending-list'),
+    # path('meeting/list/pending/', MeetingPendingAPIView.as_view(), name='meeting-pending-list'),
     path('meeting/list/in_progress/', MeetingInProgressAPIView.as_view(), name='meeting-inprogress-list'),
     path('meeting/list/completed/', MeetingCompletedAPIView.as_view(), name='meeting-completed-list'),
 ]

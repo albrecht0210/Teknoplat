@@ -62,4 +62,21 @@ class AccountCourseAPIView(generics.ListAPIView):
             return queryset
         except Course.DoesNotExist:
             return Response({'error', 'Course does not exists.'}, status=status.HTTP_404_NOT_FOUND)
-        
+
+class AccountCourseRetrieveAPIView(generics.RetrieveAPIView):
+    serializer_class = CourseSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_object(self):
+        course = Course.objects.filter(members__in=[self.request.user.id])
+
+        code_param = self.request.query_params.get("code")
+        section_param = self.request.query_params.get("section")
+
+        if code_param:
+            course = course.filter(code=code_param)
+
+        if section_param: 
+            course = course.filter(section=section_param)
+
+        return course.first()

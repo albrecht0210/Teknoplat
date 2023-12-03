@@ -74,8 +74,8 @@ class MeetingCreateAPIView(generics.CreateAPIView):
 
 class MeetingViewSet(viewsets.ModelViewSet):
     queryset = Meeting.objects.all()
-    serializer_class = MeetingSerializer
     pagination_class = LimitOffsetPagination
+    serializer_class = MeetingSerializer
     permission_classes = (permissions.IsAuthenticated, IsTeacherUserOrReadOnly, )
 
     def get_queryset(self):
@@ -93,17 +93,27 @@ class MeetingViewSet(viewsets.ModelViewSet):
     
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
 
-        meeting_data = []
-        for meeting in queryset:
-            criterias = MeetingCriteria.objects.filter(meeting=meeting)
+        serializer = self.get_serializer(page, many=True)
+        data_list = serializer.data
+
+        for meeting_data in data_list:
+            criterias = MeetingCriteria.objects.filter(meeting=meeting_data['id'])
             criteria_serializer = MeetingCriteriaSerializer(criterias, many=True)
-            meeting_serializer = self.get_serializer(meeting)
-            meeting = meeting_serializer.data
-            meeting['criteria'] = criteria_serializer.data
-            meeting_data.append(meeting)
+            meeting_data['criteria'] = criteria_serializer.data
+        return self.get_paginated_response(data_list)
+        
+        # meeting_data = []
+        # for meeting in queryset:
+        #     criterias = MeetingCriteria.objects.filter(meeting=meeting)
+        #     criteria_serializer = MeetingCriteriaSerializer(criterias, many=True)
+        #     meeting_serializer = self.get_serializer(meeting)
+        #     meeting = meeting_serializer.data
+        #     meeting['criteria'] = criteria_serializer.data
+        #     meeting_data.append(meeting)
 
-        return Response(meeting_data, status=status.HTTP_200_OK)
+        # return Response(meeting_data, status=status.HTTP_200_OK)
     
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -216,11 +226,19 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class MeetingPendingAPIView(generics.ListAPIView):
-    queryset = Meeting.objects.filter(status="pending")
+class MeetingPendingAPIView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     serializer_class = MeetingSerializer
     permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        queryset = Meeting.objects.filter(status="pending")
+        course_param = self.request.query_params.get('course', None)
+        
+        if course_param:
+            queryset = queryset.filter(course=course_param)
+        
+        return queryset
 
 class MeetingInProgressAPIView(generics.ListAPIView):
     queryset = Meeting.objects.filter(status="in_progress")

@@ -17,6 +17,15 @@ class TeamViewSet(viewsets.ModelViewSet):
     serializer_class = TeamSerializer
     permission_classes = (permissions.IsAuthenticated, IsTeacherUserOrReadOnly, )
 
+    def get_queryset(self):
+        queryset = self.queryset
+        course_param = self.request.query_params.get('course', None)
+
+        if course_param:
+            queryset = queryset.filter(course=course_param)
+
+        return queryset
+
     @action(detail=True, methods=['post'])
     def add_team_member(self, request, pk=None):
         team = self.get_object()
