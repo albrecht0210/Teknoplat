@@ -1,6 +1,6 @@
 import { Collapse, List, ListItem, ListItemButton, ListItemText, Skeleton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { storeCourse } from "../../features/data/courseSlice";
 import { deStoreHistory } from "../../features/data/pathSlice";
 import { useEffect, useState } from "react";
@@ -10,9 +10,10 @@ let CourseButton = ({ course }) => {
     const navigate = useNavigate();
 
     const handleCourseClick = (course) => {
-        dispatch(storeCourse({ course: course }));
-        dispatch(deStoreHistory());
-        const url = `/courses/${course.code.toLowerCase()}_${course.section.toLowerCase()}`;
+        // dispatch(storeCourse({ course: course }));
+        // dispatch(deStoreHistory());
+        localStorage.setItem("course", course.id);
+        const url = `/courses/${course.code.toLowerCase()}_${course.section.toLowerCase()}/meetings/`;
         navigate(url);
     }
 
@@ -48,11 +49,24 @@ let CourseButtonSkeleton = () => {
 }
 
 function CoursesList(props) {
-    const { courses, open } = props;
+    const { open } = props;
+
+    const { courses } = useOutletContext();
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     let content;
 
     // If courses is empty then use CourseLoadingButton else use CourseButton component
-    if (courses === null) {
+    if (loading) {
     // if (true) {
         content = [1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
             <CourseButtonSkeleton key={item} />

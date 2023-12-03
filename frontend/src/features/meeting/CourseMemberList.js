@@ -1,7 +1,8 @@
-import { List, ListItem, ListItemButton, ListItemText, ListSubheader, Paper, Typography } from "@mui/material";
-import { useSelector } from "react-redux";
+import { List, ListItem, ListItemButton, ListItemText, ListSubheader, Paper, Skeleton, Typography } from "@mui/material";
+import { useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-let Member = ({ member }) => {
+let MemberButton = ({ member }) => {
     return (
         <ListItem disablePadding>
             <ListItemButton>
@@ -11,41 +12,48 @@ let Member = ({ member }) => {
     )
 }
 
-let MemberLoading = () => {
+let MemberButtonSkeleton = () => {
     return (
         <ListItem disablePadding>
             <ListItemButton>
                 <ListItemText
-                    primary={
-                        <Typography className="loadingSlide">
-                            <span style={{ visibility: "hidden" }}>Loading...</span>
-                        </Typography>
-                    }
+                    primary={<Skeleton animation="wave" />}
                 />
             </ListItemButton>
         </ListItem>
     )
 }
 
-function ParticipantList() {
-    const { members } = useSelector((state) => state.course);
+function CourseMemberList() {
+    const { course } = useOutletContext();
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, [loading]);
+
+    // const { members } = useSelector((state) => state.course);
 
     let content;
 
-    if (members.length === 0) {
+    if (loading) {
         content = [0,1,2,3,4].map((item) => (
-            <MemberLoading key={item} />
+            <MemberButtonSkeleton key={item} />
         ));
     } else {
-        let teacherMembers = members
+        let teacherMembers = course.members
             .filter((member) => member.role.toLowerCase().includes("teacher"))
             .map((member) => (
-                <Member key={member.id} member={member} />
+                <MemberButton key={member.id} member={member} />
             ));
-        let studentMembers = members
+        let studentMembers = course.members
             .filter((member) => member.role.toLowerCase().includes("student"))
             .map((member) => (
-                <Member key={member.id} member={member} />
+                <MemberButton key={member.id} member={member} />
             ));
 
         content = (
@@ -63,7 +71,7 @@ function ParticipantList() {
     }
 
     return (
-        <Paper sx={{ height: "calc(100vh - 64px - 50px)" }}>
+        <Paper sx={{ height: "calc(100vh - 64px - 48px)" }}>
             <List>
                 { content }
             </List>
@@ -71,4 +79,4 @@ function ParticipantList() {
     );
 }
 
-export default ParticipantList;
+export default CourseMemberList;

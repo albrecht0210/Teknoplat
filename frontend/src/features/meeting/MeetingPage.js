@@ -1,159 +1,158 @@
 import { Box, Button, Grid, Stack, Typography } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { formatUrlToString } from "../../utils/helper";
+import { Form, Outlet, redirect, useLoaderData, useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { refreshAccessToken } from "../../services/services";
 import TabContainer from "../../components/tab/TabContainer";
 import { useState } from "react";
-import TabPanel from "../../components/tab/TabPanel";
-import ParticipantList from "./ParticipantList";
-import PitchList from "./PitchList";
-import CriteriaList from "./CriteriaList";
-import CommentCard from "./CommentCard";
-import { useCreateVideoMeetingMutation, useUpdateMeetingMutation, useValidateVideoMeetingMutation } from "../api/apiSlice";
-import { useLocation, useNavigate } from "react-router-dom";
-import { storeReplaceMeeting } from "../data/meetingSlice";
+import CourseMemberList from "./CourseMemberList";
 
-let MeetingDetail = ({ meeting, tabOptions, handleChange, value }) => {
-    const { profile } = useSelector((state) => state.account);
-    const { video } = useSelector((state) => state.auth);
-    const [createVideoMeeting, { isSuccess: createVideoSuccess }] = useCreateVideoMeetingMutation();
-    const [validateVideoMeeting] = useValidateVideoMeetingMutation();
-    const [updateMeeting, { isSuccess: updateMeetingSuccess }] = useUpdateMeetingMutation();
+const fetchMeeting = async () => {
+    const access = Cookies.get("access");
+    const meetingId = localStorage.getItem("meeting");
+    const response = await axios.get(`http://localhost:8008/api/meetings/${meetingId}/`, {
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
+
+const validateVideoID = async () => {
+    const token = Cookies.get("video");
+    const access = Cookies.get("access");
+    const videoId = localStorage.getItem("videoId");
     
+    const response = await axios.post(`http://localhost:8008/api/video/validate-meeting/${videoId}/`, 
+        {
+            token: token
+        }, 
+        { 
+            headers: {
+                Authorization: `Bearer ${access}`
+            }
+        }
+    );
 
-    const dispatch = useDispatch();
+    return response;
+}
+
+export async function meetingLoader({ request, params }) {
+    try {
+        const meetingResponse = await fetchMeeting();
+
+        localStorage.setItem("videoId", meetingResponse.data.video);
+        return meetingResponse.data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            try {
+                await refreshAccessToken();
+                const meetingResponse = await fetchMeeting();
+
+                localStorage.setItem("videoId", meetingResponse.data.video);
+                return meetingResponse.data;
+            } catch (refreshError) {
+                Cookies.remove("access");
+                Cookies.remove("refresh");
+                Cookies.remove("video");
+                return redirect("/login");
+            }
+        }
+        return redirect("/");
+    }
+}
+
+export async function meetingAction({ request, params }) {
+    let formData = await request.formData();
+    let intent = formData.get("intent");
+
+    if (intent === "join") {
+        try {
+            await validateVideoID();
+            return redirect(`/live/${params.meetingName}`);
+        } catch(error) {
+            console.log(error.response.data);
+            return error.response.data;
+        }
+    }
+
+    if (intent === "start") {
+
+    }
+
+}
+
+function MeetingPage() {
+    const meeting = useLoaderData();
+    const { profile } = useOutletContext();
+
     const navigate = useNavigate();
-    
     const location = useLocation();
     const currentUrl = location.pathname;
-
+    const urlPath = currentUrl.split("meetings/");
+    const meetingPath = urlPath[1].split("/");
     let actionButton;
 
-    const handleJoinClick = async (meeting) => {
-        console.log(meeting.video);
-        const data = { credentials: { token: video }, video: meeting?.video };
-        await validateVideoMeeting(data)
-            .unwrap()
-            .then((payload) => {
-                const urlPatterns = currentUrl.split("/meetings/");
-                navigate(`/video_meet/${urlPatterns[1]}`);
-            });
-    }
-
-    const handleStartClick = async (meeting) => {
-        await createVideoMeeting({ token: video })
-            .unwrap()
-            .then(async(payload) => {
-                const urlPatterns = currentUrl.split("/meetings/");
-                if (createVideoSuccess) {
-                    const newMeeting = {
-                        ...meeting,
-                        video: payload.meetingId
-                    }
-                    dispatch(storeReplaceMeeting({ meeting: newMeeting }));
-                    await updateMeeting({ id: meeting.id, meeting: newMeeting }).unwrap();
-
-                    if (updateMeetingSuccess) {
-                        navigate(`/video_meet/${urlPatterns[1]}`);
-                    }
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
-
     if (meeting.status === "in_progress") {
-        actionButton = <Button variant="contained" onClick={() => handleJoinClick(meeting)}>Join</Button>;
+        actionButton = (
+            <Form method="post">
+                <Button type="submit" name="intent" value="join" variant="contained">Join</Button>
+            </Form>
+        );
     } else if (meeting.status === "pending") {
         if (profile?.role === "Student") {
             actionButton = <Button variant="contained" disabled>Start</Button>;
         } else {
-            actionButton = <Button variant="contained" onClick={() => handleStartClick(meeting)}>Start</Button>;
+            actionButton = <Button variant="contained">Start</Button>;
         }
     } else if (meeting.status === "completed") {
         actionButton = <Button variant="contained">View</Button>;
     }
 
-    return (
-        <>
-            <Grid item sm={12} md={8}>
-                <Stack spacing={3} sx={{ mb: "24px" }}>
-                    <Stack direction="row" spacing={5}>
-                        <Typography variant="h5">{ meeting.name }</Typography>
-                        { actionButton }
-                    </Stack>
-                    <Typography fontWeight={100} variant="h6">{ meeting.description }</Typography>
-                </Stack>
-                <TabContainer
-                    tabOptions={tabOptions}
-                    handleTabChange={handleChange}
-                    selected={value}
-                />
-                <TabPanel
-                    selected={value}
-                    name="Pitch"
-                    value={0}
-                    height="calc(100% - 65.5px - 65.5px - 65.5px)"
-                >
-                    <PitchList />
-                </TabPanel>
-                <TabPanel
-                    selected={value}
-                    name="Criteria"
-                    value={1}
-                    height="calc(100% - 65.5px - 65.5px - 65.5px)"
-                >
-                    <CriteriaList />
-                </TabPanel>
-                <TabPanel
-                    selected={value}
-                    name="Comment"
-                    value={2}
-                    height="calc((((100% - 65.5px) - 65.5px) - 65.5px ) - 65.5px)"
-                >
-                    <CommentCard />
-                </TabPanel>
-            </Grid>
-            <Grid item sm={12} md={4}>
-                <ParticipantList />
-            </Grid>
-        </>
-    );
-}
-
-let MeetingDetailLoading = ({ tabOptions, handleChange, value }) => {
-}
-
-function MeetingPage() {
-    const { meeting } = useSelector((state) => state.meeting);
-    
     const tabOptions = [
-        { value: 0, name: "Pitch" },
-        { value: 1, name: "Criteria" },
-        { value: 2, name: "Comments" }
+        { value: 0, name: "Pitch", stringValue: "pitch" },
+        { value: 1, name: "Criteria", stringValue: "criteria" },
+        { value: 2, name: "Comments", stringValue: "comments" }
     ];
 
-    const [tabValue, setTabValue] = useState(0);
+    const initTabValue = localStorage.getItem("meetingTabValue") ? Number(localStorage.getItem("meetingTabValue")) : 0;
+    const [meetingTabValue, setMeetingTabValue] = useState(initTabValue);
 
     const handleTabChange = (event, value) => {
-        setTabValue(value);
-    }
-    
-    let content;
-
-    if (meeting === null) {
-        content = <MeetingDetailLoading tabOptions={tabOptions} handleChange={handleTabChange} value={tabValue} />;
-    }  else {
-        content = <MeetingDetail meeting={meeting} tabOptions={tabOptions} handleChange={handleTabChange} value={tabValue} />;
+        const option = tabOptions.find((option) => option.value === value);
+        localStorage.setItem("meetingTabValue", value);
+        setMeetingTabValue(value);
+        const url = `${urlPath[0]}meetings/${meetingPath[0]}/${option.stringValue}`;
+        console.log(url);
+        navigate(url);
     }
 
     return (
-        <Box height="calc(100% - (64px + 50px))">
+        <Box>
             <Grid
                 container
                 spacing={2}
-                height="calc(100% - (64px + 100px))"
             >
-                { content }
+                <Grid item sm={12} md={8}>
+                    <Stack spacing={3} sx={{ mb: 3 }}>
+                        <Stack direction="row" spacing={5}>
+                            <Typography variant="h5">{ meeting.name }</Typography>
+                            { actionButton }
+                        </Stack>
+                        <Typography fontWeight={100} variant="h6">{ meeting.description }</Typography>
+                    </Stack>
+                    <TabContainer 
+                        tabOptions={tabOptions}
+                        handleChange={handleTabChange}
+                        selected={meetingTabValue}
+                    />
+                    <Outlet context={{ profile: profile, meeting: meeting }} />
+                </Grid>
+                <Grid item sm={12} md={4}>
+                    <CourseMemberList />
+                </Grid>
             </Grid>
         </Box>
     );

@@ -1,31 +1,64 @@
-import { Box, Button, Divider, IconButton, Paper, Stack } from "@mui/material";
+import { Box, Button, Divider, IconButton, Paper, Stack, Tooltip } from "@mui/material";
 import { useMeeting } from "@videosdk.live/react-sdk";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import VideocamIcon from '@mui/icons-material/Videocam';
-import MicIcon from '@mui/icons-material/Mic';
-import CallEndIcon from '@mui/icons-material/CallEnd';
-import EditNoteIcon from '@mui/icons-material/EditNote';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { useState } from "react";
+import { CallEnd, EditNote, Mic, MicOff, PeopleAlt, ScreenShare, StopScreenShare, VideoChat, Videocam, VideocamOff } from "@mui/icons-material";
 
 function Controls(props) {
-    const { handleRatePanelButtonClick, handleParticipantPanelButtonClick } = props;
+    const { handleToggleSlide } = props;
+    const { profile } = useOutletContext();
+
+    console.log(profile);
     const navigate = useNavigate();
 
-    const { leave, toggleMic, toggleWebcam, end } = useMeeting(
-        {
-            onParticipantLeft: (participant) => {
-                console.log(" onParticipantLeft", participant);
-                navigate("/");
-            },
-            onConnectionClose: (connectionId) => {
-                console.log("ConnectionId", connectionId);
-                navigate("/");
-            }
+    const onMeetingLeft = () => {
+        navigate("/")
+    }
+    
+    const onParticipantLeft = (participant) => {
+        if (profile.id === participant) {
+            navigate("/");
         }
-    );
+    }
 
-    const { profile } = useSelector((state) => state.account);
+    const { leave, toggleMic, toggleWebcam, end } = useMeeting({onMeetingLeft, onParticipantLeft});
+
+    const [onCam, setOnCam] = useState(true);
+    const [onMic, setOnMic] = useState(true);
+    const [onShareScreen, setOnShareScreen] = useState(false);
+    const [onRate, setOnRate] = useState(false);
+    const [onParticipant, setOnParticipant] = useState(false);
+    const [onVideoChat, setOnVideoChat] = useState(false);
+
+    const handleToggleCam = () => {
+        toggleWebcam();
+        setOnCam(!onCam);
+    }
+
+    const handleToggleMic = () => {
+        toggleMic();
+        setOnMic(!onMic);
+    }
+
+    const handleToggleShareScreen = () => {
+        setOnShareScreen(!onShareScreen);
+    }
+
+    const handleToggleRate = () => {
+        handleToggleSlide();
+        setOnRate(!onRate);
+    }
+
+    const handleToggleParticipants = () => {
+        handleToggleSlide();
+        setOnParticipant(!onParticipant);
+        navigate("participants");
+    }
+
+    const handleToggleVideoChat = () => {
+        handleToggleSlide();
+        setOnVideoChat(!onVideoChat);
+    }
 
     const handleEnd = () => {
         end();
@@ -38,8 +71,95 @@ function Controls(props) {
     }
 
     return (
-        <Paper sx={{ position: "absolute", bottom: 24, left: 0, width: "-webkit-fill-available", p: 2, mx: 3, zIndex: 900 }} >
-            <Stack direction="row" spacing={3} justifyContent="end">
+        <Paper sx={{ py: 2, px: 4 }} >
+            <Box display="flex" justifyContent="space-between">
+                <Box width="152px" />
+                <Stack direction="row" spacing={2}>
+                    { profile.role === "Teacher" && (
+                        <>
+                            <Tooltip title={onShareScreen ? "Off ShareScreen" : "On ShareScreen"}>
+                                <IconButton aria-label="toggleShareScreen" onClick={handleToggleShareScreen}>
+                                    {onShareScreen ? <StopScreenShare /> : <ScreenShare />}
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title={onMic ? "Off Mic" : "On Mic"}>
+                                <IconButton aria-label="toggleMic" onClick={handleToggleMic}>
+                                    {onMic ? <MicOff /> : <Mic />}
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title={onCam ? "Off Cam" : "On Cam"}>
+                                <IconButton aria-label="toggleWebcam" onClick={handleToggleCam}>
+                                    {onCam ? <VideocamOff /> : <Videocam />}
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="End Call">
+                                <IconButton 
+                                    onClick={handleEnd} 
+                                    aria-label="endCall" 
+                                    sx={{ 
+                                        backgroundColor: "#ff4313", 
+                                        color: "white", 
+                                        ":hover": {
+                                            backgroundColor: "#ff430080"
+                                        }
+                                    }}
+                                >
+                                    <CallEnd />
+                                </IconButton>
+                            </Tooltip>
+                        </>
+                    ) }
+                    { profile.role === "Student" && (
+                        <>
+                            <Tooltip title="Leave Call">
+                                <IconButton 
+                                    onClick={handleLeave} 
+                                    aria-label="leaveCall" 
+                                    sx={{ 
+                                        backgroundColor: "#ff4313", 
+                                        color: "white", 
+                                        ":hover": {
+                                            backgroundColor: "#ff430080"
+                                        }
+                                    }}
+                                >
+                                    <CallEnd />
+                                </IconButton>
+                            </Tooltip>
+                        </>
+                    ) }
+                </Stack>
+                <Stack direction="row" spacing={2}>
+                    <Tooltip title="Rate">
+                        <IconButton 
+                            onClick={handleToggleRate} 
+                            aria-label="toggleRate" 
+                            color={onRate ? "primary": "default"}
+                        >
+                            <EditNote />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Participant">
+                        <IconButton 
+                            onClick={handleToggleParticipants}
+                            aria-label="toggleParticipants"
+                            color={onParticipant ? "primary": "default"}
+                        >
+                            <PeopleAlt />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Chat">
+                        <IconButton 
+                            onClick={handleToggleVideoChat}
+                            aria-label="toggleVideoChat"
+                            color={onVideoChat ? "primary": "default"}
+                        >
+                            <VideoChat />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            </Box>
+            {/* <Stack direction="row" spacing={3}>
                 <Stack direction="row" spacing={2}>
                     <IconButton aria-label="toggleMic">
                         <MicIcon />
@@ -48,8 +168,8 @@ function Controls(props) {
                         <VideocamIcon />
                     </IconButton>
                 </Stack>
-                {/* <button onClick={() => toggleMic()}>toggleMic</button> */}
-                {/* <button onClick={() => toggleWebcam()}>toggleWebcam</button> */}
+                <button onClick={() => toggleMic()}>toggleMic</button>
+                <button onClick={() => toggleWebcam()}>toggleWebcam</button> 
                 <Divider sx={{ color: "grey" }} />
                 <Stack direction="row" spacing={2}>
                     <IconButton onClick={handleRatePanelButtonClick} aria-label="toggleRate">
@@ -70,7 +190,7 @@ function Controls(props) {
                         <CallEndIcon />
                     </IconButton>
                 )}
-            </Stack>
+            </Stack> */}
         </Paper>
     );
 }

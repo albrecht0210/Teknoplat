@@ -1,23 +1,76 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useGetMeetingsByCourseAndStatusQuery } from "../api/apiSlice";
-import { storeMeeting, storeMeetings } from "../data/meetingSlice";
+import { Box, Button, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { redirect, useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import { refreshAccessToken } from "../../services/services";
+import { useEffect, useState } from "react";
 import { formatStringToUrl } from "../../utils/helper";
-import { storeMeetingPaths } from "../data/pathSlice";
-import { useLocation, useNavigate } from "react-router-dom";
 
-// Meeting Row Data
+const fetchMeetings = async (url) => {
+    const access = Cookies.get("access");
+
+    const response = await axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
+
+export async function meetingsLoader({ request, params }) {
+    const originalUrl = request.url;
+    const baseUrl = "http://localhost:3000/";
+    const course = localStorage.getItem("course");
+    const currentUrl = originalUrl.replace(baseUrl, '');
+    const urlParts = currentUrl.split("meetings/");
+    let status;
+    if (urlParts[1] === "" || urlParts[1] === "in_progress") {
+        localStorage.setItem("statusTabValue", 1);
+        status = "in_progress";
+    } else if (urlParts[1] === "pending") {
+        localStorage.setItem("statusTabValue", 0);
+        status = "pending";
+    } else if (urlParts[1] === "completed") {
+        localStorage.setItem("statusTabValue", 2);
+        status = "completed";
+    } else {
+        return redirect("/");
+    }
+
+    try {
+        const meetingsResponse = await fetchMeetings(`http://localhost:8008/api/meetings/?limit=5&offset=0&course=${course}&status=${status}`);
+
+        return meetingsResponse.data;
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            try {
+                await refreshAccessToken();
+                const meetingsResponse = await fetchMeetings(`http://localhost:8008/api/meetings/?limit=5&offset=5&course=${course}&status=${status}`);
+                
+                return meetingsResponse.data;
+            } catch (refreshError) {
+                Cookies.remove("access");
+                Cookies.remove("refresh");
+                Cookies.remove("video");
+                return redirect("/login");
+            }
+        } else {
+            console.log(error.response.data);
+        }
+    }
+}
+
 let MeetingRow = ({ meeting }) => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-
     const location = useLocation();
-    const currentUrl = location.pathname;
 
     const handleMeetingClick = (meeting) => {
-        dispatch(storeMeeting({ meeting: meeting }));
-        const url = `${currentUrl}/meetings/${formatStringToUrl(meeting.name)}`;
+        const currentUrl = location.pathname;
+        const urlPath = currentUrl.split("meetings/");
+        const url = `${urlPath[0]}meetings/${formatStringToUrl(meeting.name)}`;
+        localStorage.setItem("meeting", meeting.id);
+        localStorage.setItem("videoId", meeting.video);
         navigate(url);
     }
 
@@ -39,105 +92,105 @@ let MeetingRow = ({ meeting }) => {
     )
 }
 
-// Meeting Row Loading
-let MeetingLoadingRow = () => {
+let MeetingRowSkeleton = () => {
     return (
         <TableRow>
             <TableCell>
-                <Button
-                    variant="contained"
-                    size="small"
-                    className="loadingSlide"
-                >
-                    <span style={{ visibility: "hidden" }}>View</span>
-                </Button>
+                <Skeleton variant="rounded" />
             </TableCell>
             <TableCell>
-                <Typography className="loadingSlide">
-                    <span style={{ visibility: "hidden" }}>Loading...</span>
-                </Typography>
+                <Skeleton variant="rounded" />
             </TableCell>
             <TableCell>
-                <Typography className="loadingSlide">
-                    <span style={{ visibility: "hidden" }}>Loading...</span>
-                </Typography>
+                <Skeleton variant="rounded" />
             </TableCell>
             <TableCell>
-                <Typography className="loadingSlide">
-                    <span style={{ visibility: "hidden" }}>Loading...</span>
-                </Typography>
+                <Skeleton variant="rounded" />
             </TableCell>
         </TableRow>
-    );
+    )
 }
 
-function MeetingTable(props) {
-    const { search, status } = props;
+function MeetingTable() {
+    const data = useLoaderData();
 
-    // Retrieve course from store
-    const { course } = useSelector((state) => state.course);
-
-    // Fetch Meetings via course and status
-    const { data: meetings = [], isSuccess, refetch } = useGetMeetingsByCourseAndStatusQuery({ course: course?.id, status: status });
-
-    const dispatch = useDispatch();
+    const [meetings, setMeetings] = useState(data.results);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [page, setPage] = useState(0);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // If course is not null then refetch meetings
-        if (course !== null) {
-            refetch();
-        }
-    }, [refetch, course]);
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, [loading]);
 
     useEffect(() => {
-        // If success in fetching meetings then store to meetings and store to meeting paths
-        if (isSuccess) {
-            dispatch(storeMeetings({ meetings: meetings }));
-            
-            const meetingPaths = meetings.map((meeting) => {
-                return {
-                    type: "meeting",
-                    name: `${meeting.name}`,
-                    to: `/courses/${course.code.toLowerCase()}_${course.section.toLowerCase()}/meetings/${formatStringToUrl(meeting.name)}`
-                };
-            });
-
-            dispatch(storeMeetingPaths({ meeting: meetingPaths }));
-        }
-    }, [dispatch, course, meetings, isSuccess]);
+        setMeetings(data.results);
+    }, [data]);
 
     let content;
 
-    // If meeting is empty then use MeetingLoadingRow component else use the MeetingRow with filtered with search input
-    if (meetings.length === 0) {
-    // if (true) {
-        content = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
-            <MeetingLoadingRow key={item} />
+    if (loading) {
+        content = [0, 1, 2, 3, 4, 5].map((item) => (
+            <MeetingRowSkeleton key={item} />
         ));
     } else {
-        content = meetings
-            .filter((meeting) => meeting.name.toLowerCase().includes(search.toLowerCase()))
-            .map((meeting) => (
-                <MeetingRow meeting={meeting} key={meeting.id} />
-            ));
+        content = meetings.map((meeting) => (
+            <MeetingRow key={meeting.id} meeting={meeting} />
+        ));
     }
 
     return (
-        <TableContainer component={Paper} sx={{ height: "100%" }}>
-            <Table stickyHeader aria-label="meeting-table">
-                <TableHead>
-                    <TableRow>
-                        <TableCell sx={{ width: "calc(100% * 0.09)" }}></TableCell>
-                        <TableCell>Title</TableCell>
-                        <TableCell sx={{ width: "calc(100% * 0.2)" }}>Teacher Score Weight</TableCell>
-                        <TableCell sx={{ width: "calc(100% * 0.2)" }}>Student Score Weight</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    { content }
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <Box p={5}>
+            <Paper>
+                <TableContainer 
+                    sx={{ 
+                        height: "calc(100vh - 64px - 48px - 48px - 80px - 52px - 1px)",
+                        overflowY: "hidden",
+                        ":hover": {
+                            overflowY: "auto",
+                            scrollbarWidth: "thin",
+                            "&::-webkit-scrollbar": {
+                                width: "8px",
+                            },
+                            "&::-webkit-scrollbar-thumb": {
+                                backgroundColor: (theme) => theme.palette.primary.main,
+                                borderRadius: "4px",
+                            },
+                            "&::-webkit-scrollbar-track": {
+                                backgroundColor: (theme) => theme.palette.background.paper,
+                            },
+                        },
+                    }}
+                >
+                    <Table stickyHeader>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell sx={{ width: "calc(100% * 0.09)", opacity: 0.9 }}></TableCell>
+                                <TableCell sx={{ opacity: 0.9 }}>Title</TableCell>
+                                <TableCell sx={{ width: "calc(100% * 0.2)", opacity: 0.9 }}>Teacher Score Weight</TableCell>
+                                <TableCell sx={{ width: "calc(100% * 0.2)", opacity: 0.9 }}>Student Score Weight</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            { content }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    component="div"
+                    count={data.count}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    // onPageChange={handleChangePage}
+                    // onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+            </Paper>
+        </Box>
     );
 }
 

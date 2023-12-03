@@ -15,18 +15,38 @@ const fetchProfile = async () => {
     return response;
 }
 
+const fetchCourses = async () => {
+    const access = Cookies.get("access");
+
+    const response = await axios.get("http://localhost:8080/api/account/profile/courses/", {
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
+
 export async function authLoader() {
     try {
         const profileResponse = await fetchProfile();
+        const coursesResponse = await fetchCourses();
         
-        return profileResponse.data;
+        return {
+            profile: profileResponse.data,
+            courses: coursesResponse.data
+        };
     } catch (error) {
         if (error.response && error.response.status === 401) {
             try {
                 await refreshAccessToken();
                 const profileResponse = await fetchProfile();
+                const coursesResponse = await fetchCourses();
 
-                return profileResponse.data;
+                return {
+                    profile: profileResponse.data,
+                    courses: coursesResponse.data
+                };
             } catch (refreshError) {
                 Cookies.remove("access");
                 Cookies.remove("refresh");
@@ -42,10 +62,9 @@ export async function authLoader() {
 function AuthenticatedLayout() {
     const data = useLoaderData();
     const access = Cookies.get("access");
-    console.log("Test");
-    console.log(access);
+
     return (
-        access ? <Outlet context={{ profile: data }} /> : <Navigate to="/login" />
+        access ? <Outlet context={{ profile: data.profile, courses: data.courses }} /> : <Navigate to="/login" />
     );
 }
 

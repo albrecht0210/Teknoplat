@@ -82,7 +82,7 @@ function AccountOption() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoading(false);
-        }, 1500);
+        }, 2000);
 
         return () => clearTimeout(timer);
     }, []);
@@ -99,9 +99,9 @@ function AccountOption() {
         Cookies.remove("refresh");
         Cookies.remove("access");
         Cookies.remove("video");
-        // navigate(0);
-        // navigate("/login");
-        redirect("/login");
+        localStorage.clear();
+        navigate("/login");
+        // redirect("/login");
     }
 
     return (

@@ -5,4 +5,7 @@ To Do:
 3. Fix Panel Transition
 4. Rate Panel Functionality
 5. Icon Button (Controls) should change depending on state
-6. On logout refresh - Done
+6. On logout refresh
+
+Done:
+1, 2, 3, 5, 6

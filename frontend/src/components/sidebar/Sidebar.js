@@ -6,7 +6,7 @@ import AccountOption from "./AccountOption";
 import CoursesList from "./CoursesList";
 import { useState } from "react";
 
-let SidebarOptions = ({ courses, open, handleCoursesClick }) => {
+let SidebarOptions = ({ open, handleCoursesClick }) => {
     const handleDashboardClick = () => {
         redirect("/");
     }
@@ -30,7 +30,7 @@ let SidebarOptions = ({ courses, open, handleCoursesClick }) => {
                         { open ? <ExpandLess /> : <ExpandMore /> }
                     </ListItemButton>
                 </ListItem>
-                <CoursesList courses={courses} open={open} />
+                <CoursesList open={open} />
                 <Divider />
                 <ListSubheader component="div">
                     Application
@@ -48,7 +48,7 @@ let SidebarOptions = ({ courses, open, handleCoursesClick }) => {
 }
 
 function Sidebar(props) {
-    const { courses, window, open, profile, handleClose } = props;
+    const { window, open, profile, handleClose } = props;
 
     const [coursesOpen, setCoursesOpen] = useState(true);
 
@@ -87,7 +87,7 @@ function Sidebar(props) {
                 }}
                 open
             >
-                <SidebarOptions courses={courses} open={coursesOpen} handleCoursesClick={handleCoursesOptionClick} />
+                <SidebarOptions open={coursesOpen} handleCoursesClick={handleCoursesOptionClick} />
             </Drawer>
         </Box>
     );

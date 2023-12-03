@@ -3,11 +3,14 @@ import { useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
 import { useSelector } from "react-redux";
+import { useOutletContext } from "react-router-dom";
 
 function ParticipantView(props) {
     const { participantId } = props;
     const micRef = useRef(null);
-    const { members } = useSelector((state) => state.course);
+    const { courses } = useOutletContext();
+    console.log(courses);
+
     const { webcamStream, micStream, webcamOn, micOn, isLocal, displayName } = useParticipant(participantId);
   
     const videoStream = useMemo(() => {
@@ -36,12 +39,13 @@ function ParticipantView(props) {
         }
     }, [micStream, micOn]);
 
-    const memberFound = members?.find((member) => member.id === participantId);
-    const isTeacher = memberFound?.role === "Teacher";
+    const getCourse = courses.find((course) => course.id === Number(localStorage.getItem("course")));
+    const memberFound = getCourse.members.find((member) => member.id === participantId);
+    const isTeacher = memberFound.role === "Teacher";
     
     if (isTeacher) {
         return (
-            <Box sx={{ display: "flex", width: "100%", height: "calc(100vh - 48px - 56px - 24px)" }}>
+            <Box>
                 {/* <p>
                   Participant: {displayName} | Webcam: {webcamOn ? "ON" : "OFF"} | Mic:{" "}
                   {micOn ? "ON" : "OFF"}
@@ -59,7 +63,7 @@ function ParticipantView(props) {
                     //
                     url={videoStream}
                     //
-                    height={"-webkit-fill-available"}
+                    height={"calc(100vh - 72px - 48px - 24px)"}
                     width={"-webkit-fill-available"}
                     onError={(err) => {
                       console.log(err, "participant video error");

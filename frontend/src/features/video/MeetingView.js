@@ -4,21 +4,25 @@ import ParticipantView from "./ParticipantView";
 import { useSelector } from "react-redux";
 import { Box, Collapse, Grid, Slide, Stack } from "@mui/material";
 import Controls from "./Controls";
-import VideoParticipantList from "./VideoParticipantList";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
+import ParticipantPanel from "./ParticipantPanel";
 
-function MeetingView() {
+function MeetingView(props) {
+    const { meeting } = props;
     //Get the method which will be used to join the meeting.
     //We will also get the participants list to display all participants
     const navigate = useNavigate();
+    const { courses } = useOutletContext();
 
-    const { join, participants } = useMeeting({
-        onParticipantLeft: (participant) => {
-            console.log(" onParticipantLeft", participant);
+    const onParticipantLeft = (participant) => {
+        if (meeting.owner === participant) {
             navigate("/");
         }
-    });
+    }
+
+    const { join, participants } = useMeeting({onParticipantLeft});
     const [load, setLoad] = useState(true);
+    const [slide, setSlide] = useState(false);
 
     useEffect(() => {
         if (load) {
@@ -27,33 +31,38 @@ function MeetingView() {
             join();
         }
     }, [load]);
-    // join();
 
-    const [ratePanelIsVisible, setRatePanelIsVisible] = useState(false);
-    const [participantPanelIsVisible, setParticipantPanelIsVisible] = useState(true);
+    const testData = [...participants.keys()].map((participantId) => participantId);
 
-    const handleRatePanelButtonClick = () => {
-        setRatePanelIsVisible((prevIsVisible) => !prevIsVisible);
+    const handleToggleSlide = () => {
+        setSlide(!slide);
     }
 
-    const handleParticipantPanelButtonClick = () => {
-        setParticipantPanelIsVisible((prevIsVisible) => !prevIsVisible);
-    }
+    console.log(testData);
+
+    const getCourse = courses.find((course) => course.id === Number(localStorage.getItem("course")));
 
     return (
-        <Box sx={{ height: "100vh", p: 3, position: "relative" }}>
-            <Controls handleRatePanelButtonClick={handleRatePanelButtonClick} handleParticipantPanelButtonClick={handleParticipantPanelButtonClick} />
-            <Stack direction="row" spacing={1} sx={{ position: "relative", display: "flex" }}>
-                {[...participants.keys()].map((participantId) => (
-                    <ParticipantView
-                        participantId={participantId}
-                        key={participantId}
-                    />
-                ))}
-                <Collapse orientation="horizontal" easing={{ enter: "1", exit: "1" }} in={participantPanelIsVisible}>
-                    <VideoParticipantList participants={participants} />
+        <Box height="100vh" p={3}>
+            <Stack direction="row" spacing={2} justifyContent="space-around" sx={{ pb: 3 }}>
+                <Box />
+                <Box>
+                    {[...participants.keys()].map((participantId) => (
+                        <ParticipantView
+                            participantId={participantId}
+                            key={participantId}
+                        />
+                    ))}
+                </Box>
+                <Collapse in={slide} orientation="horizontal" >
+                    {/* <ParticipantPanel /> */}
+                    <Outlet context={{ course: getCourse, meeting: meeting }} />
                 </Collapse>
+                {/* <Slide in={slide} direction="right" container={containerRef.current} mountOnEnter unmountOnExit>
+                    <Outlet context={{ course: getCourse, meeting: meeting }} />
+                </Slide> */}
             </Stack>
+            <Controls handleToggleSlide={handleToggleSlide} />
         </Box>
     );
 }

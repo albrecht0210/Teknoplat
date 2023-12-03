@@ -4,18 +4,18 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { storeCourse } from "../data/courseSlice";
 import { deStoreHistory } from "../data/pathSlice";
 import { storeStatus } from "../data/meetingSlice";
+import { useEffect, useState } from "react";
 
 // Course Card
 let DashboardCard = ({ course }) => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleCourseClick = (course) => {
-        dispatch(storeCourse({ course: course }));
-        dispatch(deStoreHistory());
-        dispatch(storeStatus({ status: "in_progress" }));
-        localStorage.removeItem("searchMeeting");
-        const url = `/courses/${course.code.toLowerCase()}_${course.section.toLowerCase()}`;
+        // dispatch(storeCourse({ course: course }));
+        // dispatch(deStoreHistory());
+        // dispatch(storeStatus({ status: "in_progress" }));
+        localStorage.setItem("course", course.id);
+        const url = `/courses/${course.code.toLowerCase()}_${course.section.toLowerCase()}/meetings/`;
         navigate(url);
     }
 
@@ -58,28 +58,36 @@ let DashboardCardSkeleton = () => {
 function DashboardPage() {
     // Retrieve courses from store
     // const { courses } = useSelector((state) => state.course);
-    const { profile, courses } = useOutletContext();
-    // let content;
-    console.log("Profile: ", profile);
-    console.log("Courses: ", courses);
+    const { courses } = useOutletContext();
+    
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    let content;
     // If courses is empty load DashboardLoadingCard else DashboardCard
     // if (courses.length === 0) {
-    // // if (true) {
-    //     content = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
-    //         <DashboardCardSkeleton key={item} />
-    //     ));
-    // } else {
-    //     content = courses.map((course) => (
-    //         <DashboardCard course={course} key={course.id} />
-    //     ));
-    // }
+    if (loading) {
+        content = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
+            <DashboardCardSkeleton key={item} />
+        ));
+    } else {
+        content = courses.map((course) => (
+            <DashboardCard course={course} key={course.id} />
+        ));
+    }
 
     return (
-        <Box>
-            {/* <Stack direction="row" spacing={3} useFlexGap flexWrap="wrap">
+        <Box p={3}>
+            <Stack direction="row" spacing={3} useFlexGap flexWrap="wrap">
                 { content }
-            </Stack> */}
-            <Typography>Dashboard</Typography>
+            </Stack>
         </Box>
     );
 }

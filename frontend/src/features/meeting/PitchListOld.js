@@ -1,9 +1,9 @@
 import { ExpandMore } from "@mui/icons-material";
-import { Accordion, AccordionDetails, AccordionSummary, Box, Stack, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Skeleton, Stack, Typography } from "@mui/material";
 import { useGetMembersForTeamQuery, useGetTeamsForPitchQuery } from "../api/apiSlice";
 import { useSelector } from "react-redux";
 
-let Pitch = ({ pitch }) => {
+let PitchAccordion = ({ pitch }) => {
     const { data: team } = useGetTeamsForPitchQuery({ id: pitch.id });
     const { data: members = [] } = useGetMembersForTeamQuery({ id: pitch.id });
 
@@ -37,22 +37,20 @@ let Pitch = ({ pitch }) => {
     );
 }
 
-let PitchLoading = ({ item }) => {
+let PitchAccordionSkeleton = () => {
     return (
-        <Accordion key={item}>
+        <Accordion>
             <AccordionSummary
                 expandIcon={<ExpandMore />}
                 aria-controls={`${item}-content`}
                 id={`${item}-header`}
             >
-                <Stack direction="row" spacing={1}>
-                    <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
-                </Stack>
+                <Skeleton variant="text" />
             </AccordionSummary>
             <AccordionDetails>
-                <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
-                <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
-                <Typography className="loadingSlide"><span style={{ visibility: "hidden" }}>Loading</span></Typography>
+                <Skeleton variant="text" />
+                <Skeleton variant="text" />
+                <Skeleton variant="text" />
             </AccordionDetails>
         </Accordion>
     );

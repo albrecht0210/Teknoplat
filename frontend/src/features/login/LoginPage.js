@@ -30,9 +30,6 @@ export async function loginAction({ request }) {
     const formData = await request.formData();
     const username = formData.get("username");
     const password = formData.get("password");
-    console.log("Login Action");
-    console.log(username);
-    console.log(password);
     const errors = {};
 
     if (password === "") {
@@ -50,9 +47,9 @@ export async function loginAction({ request }) {
         const authResponse = await authenticate({ username: username, password: password });
         Cookies.set("access", authResponse.data.access);
         Cookies.set("refresh", authResponse.data.refresh);
-        console.log(authResponse.data.access)
+        
         const authVideoResponse = await authenticateVideoSDK(authResponse.data.access);
-        Cookies.set("video", authVideoResponse.data.token);
+        Cookies.set("video", authVideoResponse.data);
         return redirect("/");
     } catch(error) {
         console.log(error.response.data);

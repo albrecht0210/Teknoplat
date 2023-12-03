@@ -7,7 +7,6 @@ import AuthNavbar from "../components/navbar/AuthNavbar";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-
 const fetchCourses = async () => {
     const access = Cookies.get("access");
 
@@ -46,25 +45,23 @@ export async function drawerLoader() {
 }
 
 function DrawerLayout() {
-    const data = useLoaderData();
-    const { profile } = useOutletContext();
+    const { profile, courses } = useOutletContext();
     const [mobileOpen, setMobileOpen] = useState();
 
     const handleDrawerClose = () => {
         setMobileOpen(!mobileOpen);
     }
-    console.log("DrawerLayout");
-    console.log(data);
+
     return (
         <Box sx={{ display: 'flex' }}>
             <AuthNavbar handleClick={handleDrawerClose} />
-            <Sidebar courses={data} open={mobileOpen} handleClose={handleDrawerClose} />
+            <Sidebar open={mobileOpen} handleClose={handleDrawerClose} />
             <Box
                 component="main"
-                sx={{ flexGrow: 1, width: { sm: `calc(100% - 240px)` } }}
+                sx={{ flexGrow: 1, width: { sm: `calc(100% - 240px)` }}}
             >
                 <Toolbar />
-                <Outlet context={{ profile: profile, courses: data }} />
+                <Outlet context={{ profile: profile, courses: courses }} />
             </Box>
         </Box>
     );
