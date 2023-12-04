@@ -33,17 +33,13 @@ class PitchRemarkAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         meeting_param = self.request.query_params.get('meeting', None)
-        if (meeting_param):
+        pitch_param = self.request.query_params.get('pitch', None)
+        if meeting_param:
             try:
-                pitch = Pitch.objects.get(account=self.request.user.id)
-                if not pitch.exists():
-                    raise Pitch.DoesNotExist
-                queryset = Remark.objects.filter(pitch=pitch.id, account=self.request.user.id, meeting=meeting_param)
-                if not queryset.exists():
-                    raise Remark.DoesNotExist
+                queryset = Remark.objects.filter(pitch=pitch_param, meeting=meeting_param)
+                print(queryset)
+                
                 return queryset
             except Remark.DoesNotExist:
                 return Response({'error', 'Remark does not exists.'}, status=status.HTTP_404_NOT_FOUND)
-            except Pitch.DoesNotExist:
-                return Response({'error', 'Pitch does not exists.'}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error', 'Add parameter meeting.'}, status=status.HTTP_400_BAD_REQUEST)

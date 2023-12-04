@@ -7,15 +7,15 @@ class CriteriaSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
 class MeetingCriteriaSerializer(serializers.ModelSerializer):
-    criteria = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
     meeting = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
 
     class Meta:
         model = MeetingCriteria
-        fields = ('id', 'meeting', 'criteria', 'description', 'weight')
+        fields = ('id', 'meeting', 'name', 'description', 'weight', 'criteria')
 
-    def get_criteria(self, obj):
+    def get_name(self, obj):
         return obj.criteria.name
     
     def get_meeting(self, obj):

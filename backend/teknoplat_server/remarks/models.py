@@ -14,4 +14,4 @@ class Remark(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'Remark: {self.account.full_name} on {self.pitch.name}'
+        return self.remark
