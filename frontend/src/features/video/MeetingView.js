@@ -22,7 +22,10 @@ function MeetingView(props) {
 
     const { join, participants } = useMeeting({onParticipantLeft});
     const [load, setLoad] = useState(true);
-    const [slide, setSlide] = useState(false);
+    const [collapse, setCollapse] = useState(false);
+    const [onRate, setOnRate] = useState(false);
+    const [onParticipant, setOnParticipant] = useState(false);
+    const [onVideoChat, setOnVideoChat] = useState(false);
 
     useEffect(() => {
         if (load) {
@@ -34,8 +37,39 @@ function MeetingView(props) {
 
     const testData = [...participants.keys()].map((participantId) => participantId);
 
-    const handleToggleSlide = () => {
-        setSlide(!slide);
+    const handleToggleCollapse = () => {
+        setCollapse(!collapse);
+    }
+    
+    const handleToggleRate = () => {
+        handleToggleCollapse();
+        setTimeout(() => {
+            setOnRate(!onRate);
+            setOnParticipant(false);
+            setOnVideoChat(false);
+        }, 800)
+    }
+
+    const handleToggleParticipants = () => {
+        handleToggleCollapse();
+        if (onParticipant) {
+            setTimeout(() => {
+                setOnRate(false);
+                setOnParticipant(!onParticipant);
+                setOnVideoChat(false);
+            }, 800)
+        } else {
+            setOnRate(false);
+            setOnParticipant(!onParticipant);
+            setOnVideoChat(false);
+        }
+    }
+
+    const handleToggleVideoChat = () => {
+        handleToggleCollapse();
+        setOnRate(false);
+        setOnParticipant(false);
+        setOnVideoChat(!onVideoChat);
     }
 
     console.log(testData);
@@ -44,7 +78,7 @@ function MeetingView(props) {
 
     return (
         <Box height="100vh" p={3}>
-            <Stack direction="row" spacing={2} justifyContent="space-around" sx={{ pb: 3 }}>
+            <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ pb: 3 }}>
                 <Box />
                 <Box>
                     {[...participants.keys()].map((participantId) => (
@@ -54,15 +88,17 @@ function MeetingView(props) {
                         />
                     ))}
                 </Box>
-                <Collapse in={slide} orientation="horizontal" >
-                    {/* <ParticipantPanel /> */}
-                    <Outlet context={{ course: getCourse, meeting: meeting }} />
+                <Collapse in={collapse} orientation="horizontal" >
+                    {onParticipant && <ParticipantPanel course={ getCourse } participants={[...participants.keys()]}/>}
+                    {/* <Outlet context={{ participants: [...participants.keys()], course: getCourse, meeting: meeting }} /> */}
                 </Collapse>
-                {/* <Slide in={slide} direction="right" container={containerRef.current} mountOnEnter unmountOnExit>
-                    <Outlet context={{ course: getCourse, meeting: meeting }} />
-                </Slide> */}
             </Stack>
-            <Controls handleToggleSlide={handleToggleSlide} />
+            <Controls 
+                rate={{ onRate, handleToggleRate }} 
+                participant={{ onParticipant, handleToggleParticipants }} 
+                chat={{ onVideoChat, handleToggleVideoChat }} 
+                handleToggleCollapse={handleToggleCollapse}
+            />
         </Box>
     );
 }

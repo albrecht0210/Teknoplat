@@ -5,7 +5,7 @@ import { useState } from "react";
 import { CallEnd, EditNote, Mic, MicOff, PeopleAlt, ScreenShare, StopScreenShare, VideoChat, Videocam, VideocamOff } from "@mui/icons-material";
 
 function Controls(props) {
-    const { handleToggleSlide } = props;
+    const { rate, participant, chat } = props;
     const { profile } = useOutletContext();
 
     console.log(profile);
@@ -26,9 +26,7 @@ function Controls(props) {
     const [onCam, setOnCam] = useState(true);
     const [onMic, setOnMic] = useState(true);
     const [onShareScreen, setOnShareScreen] = useState(false);
-    const [onRate, setOnRate] = useState(false);
-    const [onParticipant, setOnParticipant] = useState(false);
-    const [onVideoChat, setOnVideoChat] = useState(false);
+    
 
     const handleToggleCam = () => {
         toggleWebcam();
@@ -42,22 +40,6 @@ function Controls(props) {
 
     const handleToggleShareScreen = () => {
         setOnShareScreen(!onShareScreen);
-    }
-
-    const handleToggleRate = () => {
-        handleToggleSlide();
-        setOnRate(!onRate);
-    }
-
-    const handleToggleParticipants = () => {
-        handleToggleSlide();
-        setOnParticipant(!onParticipant);
-        navigate("participants");
-    }
-
-    const handleToggleVideoChat = () => {
-        handleToggleSlide();
-        setOnVideoChat(!onVideoChat);
     }
 
     const handleEnd = () => {
@@ -130,29 +112,29 @@ function Controls(props) {
                     ) }
                 </Stack>
                 <Stack direction="row" spacing={2}>
-                    <Tooltip title="Rate">
+                    <Tooltip title="Rate" enterDelay={300}>
                         <IconButton 
-                            onClick={handleToggleRate} 
+                            onClick={rate.handleToggleRate} 
                             aria-label="toggleRate" 
-                            color={onRate ? "primary": "default"}
+                            color={rate.onRate ? "primary": "default"}
                         >
                             <EditNote />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Participant">
+                    <Tooltip title="Participant" enterDelay={300}>
                         <IconButton 
-                            onClick={handleToggleParticipants}
+                            onClick={participant.handleToggleParticipants}
                             aria-label="toggleParticipants"
-                            color={onParticipant ? "primary": "default"}
+                            color={participant.onParticipant ? "primary": "default"}
                         >
                             <PeopleAlt />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Chat">
+                    <Tooltip title="Chat" enterDelay={300}>
                         <IconButton 
-                            onClick={handleToggleVideoChat}
+                            onClick={chat.handleToggleVideoChat}
                             aria-label="toggleVideoChat"
-                            color={onVideoChat ? "primary": "default"}
+                            color={chat.onVideoChat ? "primary": "default"}
                         >
                             <VideoChat />
                         </IconButton>
