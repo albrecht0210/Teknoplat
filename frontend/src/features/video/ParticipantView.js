@@ -1,8 +1,7 @@
-import { Box, Paper } from "@mui/material";
+import { Box } from "@mui/material";
 import { useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
-import { useSelector } from "react-redux";
 import { useOutletContext } from "react-router-dom";
 
 function ParticipantView(props) {

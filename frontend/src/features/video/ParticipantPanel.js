@@ -1,6 +1,7 @@
 import { Mic, MoreVert, Videocam } from "@mui/icons-material";
 import { Box, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Paper, Popper, Typography } from "@mui/material";
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 
 let ParticipantButton = ({ member, meeting, isStudent = false, isTeacher = true, handleMoreClick }) => {
     return (
@@ -32,6 +33,7 @@ let ParticipantButton = ({ member, meeting, isStudent = false, isTeacher = true,
 
 function ParticipantPanel(props) {
     const { course, participants } = props;
+    const { profile } = useOutletContext();
     
     const [anchorEl, setAnchorEl] = useState(null);
     const [open, setOpen] = useState(false);
@@ -106,7 +108,7 @@ function ParticipantPanel(props) {
                     Students
                 </ListSubheader>
                 {inMeeting.filter((member) => member.role === "Student").map((student) => (
-                    <ParticipantButton key={student.id} member={student} meeting={true} isStudent={true} isTeacher={false} handleMoreClick={handleTogglePopper} />
+                    <ParticipantButton key={student.id} member={student} meeting={true} isStudent={true} isTeacher={profile.role === "Teacher"} handleMoreClick={handleTogglePopper} />
                 ))}
                 <ListSubheader sx={{ backgroundColor: "inherit" }}>
                     Not In Meeting

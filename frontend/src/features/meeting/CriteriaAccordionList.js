@@ -8,10 +8,10 @@ let CriteriaAccordion = ({ criteria }) => {
         <Accordion>
             <AccordionSummary
                 expandIcon={<ExpandMore />}
-                aria-controls={`${criteria.criteria}-content`}
-                id={`${criteria.criteria}-header`}
+                aria-controls={`${criteria.name}-content`}
+                id={`${criteria.name}-header`}
             >
-                <Typography>{`${criteria.criteria} - ${criteria.weight * 100}%` }</Typography>
+                <Typography>{`${criteria.name} - ${criteria.weight * 100}%` }</Typography>
             </AccordionSummary>
             <AccordionDetails>
                 <Typography sx={{ mb: 2 }}>{ criteria.description }</Typography>

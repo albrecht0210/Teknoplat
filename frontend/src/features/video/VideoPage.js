@@ -51,13 +51,16 @@ function VideoPage() {
     const { profile } = useOutletContext();
     const video = Cookies.get("video");
 
+    const openMic = localStorage.getItem("openMic");
+    const openWebcam = localStorage.getItem("openWebcam");
+
     return (
         <Box height="100vh">
             <MeetingProvider
                 config={{
                     meetingId: meeting.video,
-                    micEnabled: profile.role === "Teacher" || profile.role === "Admin" ? true : false,
-                    webcamEnabled: profile.role === "Teacher" || profile.role === "Admin" ? true : false,
+                    micEnabled: openMic === "true" ? true : false,
+                    webcamEnabled: openWebcam === "true" ? true : false,
                     name: profile.full_name,
                     participantId: profile.id,
                 }}

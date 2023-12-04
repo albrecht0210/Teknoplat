@@ -3,9 +3,39 @@ import { useMeeting } from "@videosdk.live/react-sdk";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
 import { CallEnd, EditNote, Mic, MicOff, PeopleAlt, ScreenShare, StopScreenShare, VideoChat, Videocam, VideocamOff } from "@mui/icons-material";
+import Cookies from "js-cookie";
+import axios from "axios";
+
+const updateMeetingStatusToCompleted = async (meeting) => {
+    const access = Cookies.get("access");
+    const data = {
+        ...meeting,
+        status: "completed"
+    }
+
+    const response = await axios.put(`http://localhost:8008/api/meetings/${[meeting.id]}/`, data, {
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
+
+const getPitchRemarks = async (pitch) => {
+    const access = Cookies.get("access");
+
+    const response = await axios.get(`http://localhost:8008/api/meetings/${[pitch.id]}/`, {
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
 
 function Controls(props) {
-    const { rate, participant, chat } = props;
+    const { meeting, rate, participant, chat } = props;
     const { profile } = useOutletContext();
 
     console.log(profile);
@@ -21,29 +51,26 @@ function Controls(props) {
         }
     }
 
-    const { leave, toggleMic, toggleWebcam, end } = useMeeting({onMeetingLeft, onParticipantLeft});
-
-    const [onCam, setOnCam] = useState(true);
-    const [onMic, setOnMic] = useState(true);
-    const [onShareScreen, setOnShareScreen] = useState(false);
-    
+    const { leave, toggleMic, localMicOn, localScreenShareOn, toggleScreenShare, toggleWebcam, localWebcamOn, end } = useMeeting({onMeetingLeft, onParticipantLeft});
 
     const handleToggleCam = () => {
+        localStorage.setItem("openWebcam", !localWebcamOn);
         toggleWebcam();
-        setOnCam(!onCam);
     }
 
     const handleToggleMic = () => {
+        localStorage.setItem("openMic", !localMicOn);
         toggleMic();
-        setOnMic(!onMic);
     }
 
     const handleToggleShareScreen = () => {
-        setOnShareScreen(!onShareScreen);
+        localStorage.setItem("openShareScreen", !localScreenShareOn);
+        toggleScreenShare();
     }
 
     const handleEnd = () => {
         end();
+        // updateMeetingStatusToCompleted(meeting);
         navigate("/");
     }
     
@@ -59,19 +86,69 @@ function Controls(props) {
                 <Stack direction="row" spacing={2}>
                     { profile.role === "Teacher" && (
                         <>
-                            <Tooltip title={onShareScreen ? "Off ShareScreen" : "On ShareScreen"}>
-                                <IconButton aria-label="toggleShareScreen" onClick={handleToggleShareScreen}>
-                                    {onShareScreen ? <StopScreenShare /> : <ScreenShare />}
+                            <Tooltip title="Screen Share">
+                                <IconButton 
+                                    aria-label="toggleShareScreen" 
+                                    onClick={handleToggleShareScreen}
+                                    sx={localScreenShareOn ? {
+                                        backgroundColor: "#3c4043", 
+                                        color: "white", 
+                                        ":hover": {
+                                            backgroundColor: "#3c4043"
+                                        }
+                                    } : { 
+                                        backgroundColor: "#ff4313", 
+                                        color: "white", 
+                                        ":hover": {
+                                            backgroundColor: "#ff430080"
+                                        }
+                                    }}
+                                >
+                                    {localScreenShareOn ? <ScreenShare /> : <StopScreenShare />}
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title={onMic ? "Off Mic" : "On Mic"}>
-                                <IconButton aria-label="toggleMic" onClick={handleToggleMic}>
-                                    {onMic ? <MicOff /> : <Mic />}
+                            {/* <Tooltip title={onMic ? "Off Mic" : "On Mic"}> */}
+                            <Tooltip title="Mic">
+                                <IconButton 
+                                    aria-label="toggleMic" 
+                                    onClick={handleToggleMic}
+                                    sx={localMicOn ? {
+                                        backgroundColor: "#3c4043", 
+                                        color: "white", 
+                                        ":hover": {
+                                            backgroundColor: "#3c4043"
+                                        }
+                                    } : { 
+                                        backgroundColor: "#ff4313", 
+                                        color: "white", 
+                                        ":hover": {
+                                            backgroundColor: "#ff430080"
+                                        }
+                                    }}
+                                >
+                                    {localMicOn ? <Mic /> : <MicOff />}
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title={onCam ? "Off Cam" : "On Cam"}>
-                                <IconButton aria-label="toggleWebcam" onClick={handleToggleCam}>
-                                    {onCam ? <VideocamOff /> : <Videocam />}
+                            {/* <Tooltip title={onCam ? "Off Cam" : "On Cam"}> */}
+                            <Tooltip title="Video">
+                                <IconButton 
+                                    aria-label="toggleWebcam" 
+                                    onClick={handleToggleCam}
+                                    sx={localWebcamOn ? {
+                                        backgroundColor: "#3c4043", 
+                                        color: "white", 
+                                        ":hover": {
+                                            backgroundColor: "#3c4043"
+                                        }
+                                    } : { 
+                                        backgroundColor: "#ff4313", 
+                                        color: "white", 
+                                        ":hover": {
+                                            backgroundColor: "#ff430080"
+                                        }
+                                    }}
+                                >
+                                    {localWebcamOn ? <Videocam /> : <VideocamOff />}
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="End Call">
