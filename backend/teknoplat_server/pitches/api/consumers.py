@@ -1,10 +1,10 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-class CommentConsumer(AsyncWebsocketConsumer):
+class PitcConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['meeting_room']
-        self.room_group_name = f'comment_{self.room_name}'
+        self.room_group_name = f'pitch_{self.room_name}'
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
@@ -15,16 +15,12 @@ class CommentConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        comment = text_data_json['comment']
-        print(text_data)
-        print(text_data_json)
-        print(comment)
+        pitch = text_data_json['pitch']
         await self.channel_layer.group_send(
-            self.room_group_name, {"type": "new.comment.message", "comment": comment}
+            self.room_group_name, {"type": "pitch.open.rate.message", "pitch": pitch}
         )
     
-    async def new_comment_message(self, event):
+    async def pitch_open_rate_message(self, event):
         print(event)
-        comment = event['comment']
-        print(f'new_comment_message: {comment}')
-        await self.send(text_data=json.dumps({'comment': comment}))
+        pitchID = event['pitch']
+        await self.send(text_data=json.dumps({'pitch': pitchID}))

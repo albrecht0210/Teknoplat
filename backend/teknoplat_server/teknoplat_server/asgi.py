@@ -16,6 +16,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
 from meetings.api.routings import websocket_urlpatterns as meeting_websocket_urls
+from pitches.api.routings import websocket_urlpatterns as pitch_websocket_urls
 from comments.api.routings import websocket_urlpatterns as comment_websocket_urls
 from chats.api.routings import websocket_urlpatterns as chat_websocket_urls
 
@@ -26,7 +27,7 @@ application = get_asgi_application()
 django_asgi_app = get_asgi_application()
 
 websocket_urlpatterns = [
-] + meeting_websocket_urls + comment_websocket_urls + chat_websocket_urls
+] + meeting_websocket_urls + pitch_websocket_urls + comment_websocket_urls + chat_websocket_urls
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,

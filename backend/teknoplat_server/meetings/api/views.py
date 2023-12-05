@@ -1,6 +1,8 @@
 import datetime
 import requests
 import json
+import re
+
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from rest_framework import generics, permissions, status, views, viewsets
@@ -44,32 +46,6 @@ class MeetingCreateAPIView(generics.CreateAPIView):
         course = self.fetch_course(course_id=instance.course)
         if self.has_error_response(course.status_code):
             return Response({'error': 'Failed to fetch courses.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        course_data = json.loads(course.content.decode('utf-8'))
-        channel_layer = get_channel_layer()
-
-        room_name = f'{course_data['code']}'
-
-        room_meeting_group_name = f'meeting_{room_name}'
-
-        async_to_sync(channel_layer.group_send)(
-            room_meeting_group_name,
-            {
-                'type': 'new_meeting_message',
-                'meeting': instance,
-            },
-        )
-
-        room_notification_group_name = f'meeting_notification_{room_name}'
-
-        async_to_sync(channel_layer.group_send)(
-            room_notification_group_name,
-            {
-                'type': 'new_meeting_message',
-                'meeting': f'New meeting in {course_data['name']}',
-            },
-        )
-
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class MeetingViewSet(viewsets.ModelViewSet):
