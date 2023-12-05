@@ -51,7 +51,10 @@ function Controls(props) {
         }
     }
 
-    const { leave, toggleMic, localMicOn, localScreenShareOn, toggleScreenShare, toggleWebcam, localWebcamOn, end } = useMeeting({onMeetingLeft, onParticipantLeft});
+    const { leave, toggleMic, localMicOn, localScreenShareOn, toggleScreenShare, toggleWebcam, localWebcamOn, end } = useMeeting({
+        onMeetingLeft, 
+        onParticipantLeft
+    });
 
     const handleToggleCam = () => {
         localStorage.setItem("openWebcam", !localWebcamOn);

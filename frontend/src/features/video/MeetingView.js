@@ -22,7 +22,18 @@ function MeetingView(props) {
         }
     }
 
-    const { join, participants } = useMeeting({onParticipantLeft});
+    const { join, participants } = useMeeting({onParticipantLeft,
+        onWebcamRequested: ({ accept, reject, participantId }) => {
+            // callback function to accept the request
+            console.log("VideoCam Requested.")
+            accept();
+        },
+        onMicRequested: ({ accept, reject, participantId }) => {
+            // callback function to accept the request
+            console.log("Microphone Requested.")
+            accept();
+        }
+    });
     const [load, setLoad] = useState(true);
     const [collapse, setCollapse] = useState(false);
     const [onRate, setOnRate] = useState(false);
@@ -100,7 +111,7 @@ function MeetingView(props) {
 
     return (
         <Box height="100vh" p={3}>
-            <Stack height="calc(100vh - 72px - 24px)" direction="row" spacing={2} justifyContent="space-between" sx={{ pb: 3 }}>
+            <Stack height="calc(100vh - 72px - 48px)" direction="row" spacing={2} justifyContent="space-between" sx={{ pb: 3 }}>
                 <Box />
                 <Box>
                     {[...participants.keys()].map((participantId) => (

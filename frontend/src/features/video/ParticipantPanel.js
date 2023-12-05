@@ -1,20 +1,56 @@
-import { Mic, MoreVert, Videocam } from "@mui/icons-material";
-import { Box, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Paper, Popper, Typography } from "@mui/material";
+import { Mic, MicOff, MoreVert, Videocam, VideocamOff } from "@mui/icons-material";
+import { Box, Fade, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Paper, Popper, Stack, Typography } from "@mui/material";
+import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
-let ParticipantButton = ({ member, meeting, isStudent = false, isTeacher = true, handleMoreClick }) => {
+let ParticipantButton = ({ member, meeting, isParticipantStudent = false, isAccountStudent = false }) => {
+    console.log(member.id);
+    const { enableWebcam: remoteEnableWebcam, disableWebcam: remoteDisableWebcam, enableMic, disableMic, webcamOn, micOn } = useParticipant(member.id);
+    const { enableWebcam: localEnableWebcam, disableWebcam: localDisableWebcam, unmuteMic, muteMic } = useMeeting({
+        onWebcamRequested: ({ accept, reject, participantId }) => {
+            // callback function to accept the request
+            accept();
+        },
+        onMicRequested: ({ accept, reject, participantId }) => {
+            // callback function to accept the request
+            accept();
+        },
+    });
+    
+    const handleToggleParticipantWebCam = () => {
+        if (webcamOn) {
+            remoteDisableWebcam();
+            localEnableWebcam();
+        } else {
+            localDisableWebcam();
+            remoteEnableWebcam();
+        }
+    }
+
+    const handleToggleParticipantMic = () => {
+        if (micOn) {
+            disableMic();
+            unmuteMic();
+        } else {
+            muteMic();
+            enableMic();
+        }
+    }
+
     return (
         <ListItem 
             disablePadding
-            secondaryAction= { meeting && isStudent && isTeacher ? (
-                <IconButton onClick={handleMoreClick} edge="end" aria-label="toggle">
-                    <MoreVert />
-                </IconButton>
-                ) : (
-                    <Box />
-                )
-            }
+            secondaryAction= {(meeting && isParticipantStudent && !isAccountStudent) && (
+                <Stack direction="row" spacing={1}>
+                    <IconButton aria-label="toggleMic" onClick={handleToggleParticipantMic}>
+                        {micOn ? <Mic /> : <MicOff />}
+                    </IconButton>
+                    <IconButton aria-label="toggleVideo" onClick={handleToggleParticipantWebCam}>
+                        {webcamOn ? <Videocam /> : <VideocamOff />}
+                    </IconButton>
+                </Stack>
+            )}
         >
             <ListItemButton 
                 disabled 
@@ -51,8 +87,8 @@ function ParticipantPanel(props) {
     console.log(notInMeeting);
 
     return (
-        <Paper sx={{ height: "calc(100vh - 72px - 48px - 24px)", width: "300px" }}>
-            <Popper open={open} anchorEl={anchorEl} placement="bottom-end" transition sx={{ zIndex: 999 }}>
+        <Paper sx={{ height: "calc(100vh - 72px - 48px - 24px)", width: "calc(100vw * 0.25)" }}>
+            {/* <Popper open={open} anchorEl={anchorEl} placement="bottom-end" transition sx={{ zIndex: 999 }}>
                 {({ TransitionProps }) => (
                 <Fade {...TransitionProps} timeout={350}>
                     <Paper sx={{ backgroundColor: "#454545" }}>
@@ -77,9 +113,10 @@ function ParticipantPanel(props) {
                     </Paper>
                 </Fade>
                 )}
-            </Popper>
+            </Popper> */}
             <List 
                 sx={{ 
+                    py: 0,
                     height: "100%",
                     overflowY: "hidden",
                     ":hover": {
@@ -102,19 +139,19 @@ function ParticipantPanel(props) {
                     Teachers
                 </ListSubheader>
                 {inMeeting.filter((member) => member.role === "Teacher").map((teacher) => (
-                    <ParticipantButton key={teacher.id} member={teacher} meeting={true} handleMoreClick={handleTogglePopper} />
+                    <ParticipantButton key={teacher.id} member={teacher} meeting={true} />
                 ))}
                 <ListSubheader sx={{ backgroundColor: "inherit" }}>
                     Students
                 </ListSubheader>
                 {inMeeting.filter((member) => member.role === "Student").map((student) => (
-                    <ParticipantButton key={student.id} member={student} meeting={true} isStudent={true} isTeacher={profile.role === "Teacher"} handleMoreClick={handleTogglePopper} />
+                    <ParticipantButton key={student.id} member={student} meeting={true} isParticipantStudent={true} isAccountStudent={profile.role === "Student"} />
                 ))}
                 <ListSubheader sx={{ backgroundColor: "inherit" }}>
                     Not In Meeting
                 </ListSubheader>
                 {notInMeeting.map((member) => (
-                    <ParticipantButton key={member.id} member={member} meeting={false} isTeacher={false} />
+                    <ParticipantButton key={member.id} member={member} meeting={false} />
                 ))}
             </List>
         </Paper>
