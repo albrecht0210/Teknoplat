@@ -1,3 +1,17 @@
+New To Do List:
+
+Important:
+
+1. Setup OpenAI API
+2. Video Functionalities (Mic, Video, ScreenShare) - Done
+3. On click open rate (teacher) should notify all parties. - Done
+
+Add ons:
+
+1. Comment - Done
+2. Chat 
+3. Chatbot
+
 To Do:
 
 1. End call should leave the meeting on all participants
@@ -8,4 +22,4 @@ To Do:
 6. On logout refresh
 
 Done:
-1, 2, 3, 5, 6
+1, 2, 3, 4, 5, 6
