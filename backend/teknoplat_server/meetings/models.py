@@ -29,7 +29,7 @@ class Meeting(models.Model):
     course = models.PositiveBigIntegerField()
 
     presentors = models.ManyToManyField('pitches.Pitch')
-    comments = models.ManyToManyField('comments.Comment')
+    comments = models.ManyToManyField('comments.Comment', blank=True)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
     video = models.CharField(max_length=50, blank=True, null=True)
     # criterias = models.ManyToManyField('criterias.Criteria', through='criterias.MeetingCriteria')

@@ -27,17 +27,16 @@ class AccountRemarkAPIView(generics.ListCreateAPIView):
                 return Response({'error', 'Remark does not exists.'}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error', 'Add parameter meeting.'}, status=status.HTTP_400_BAD_REQUEST)
 
-class PitchRemarkAPIView(generics.ListAPIView):
+class MeetingRemarkAPIView(generics.ListAPIView):
     serializer_class = RemarkSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
     def get_queryset(self):
         meeting_param = self.request.query_params.get('meeting', None)
-        pitch_param = self.request.query_params.get('pitch', None)
+
         if meeting_param:
             try:
-                queryset = Remark.objects.filter(pitch=pitch_param, meeting=meeting_param)
-                print(queryset)
+                queryset = Remark.objects.filter(meeting=meeting_param)
                 
                 return queryset
             except Remark.DoesNotExist:

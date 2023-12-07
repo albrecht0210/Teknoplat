@@ -73,7 +73,7 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(page, many=True)
         data_list = serializer.data
-
+        
         for meeting_data in data_list:
             criterias = MeetingCriteria.objects.filter(meeting=meeting_data['id'])
             criteria_serializer = MeetingCriteriaSerializer(criterias, many=True)

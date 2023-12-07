@@ -10,10 +10,10 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         queryset = self.queryset
-        pitch_param = self.request.query_params.get('pitch', None)
+        meeting_param = self.request.query_params.get('meeting', None)
 
-        if pitch_param:
-            queryset = queryset.filter(pitch=pitch_param)
+        if meeting_param:
+            queryset = queryset.filter(meeting=meeting_param)
         
         return queryset
 
