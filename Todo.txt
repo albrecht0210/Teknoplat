@@ -2,15 +2,18 @@ New To Do List:
 
 Important:
 
-1. Setup OpenAI API
+1. Setup OpenAI API - Done
 2. Video Functionalities (Mic, Video, ScreenShare) - Done
 3. On click open rate (teacher) should notify all parties. - Done
+4. On click open rate (teacher) depending on the user if user is part of the team then no change if not can rate. - Done
+5. History - Done
+6. Start Meeting - Done?
 
 Add ons:
 
 1. Comment - Done
-2. Chat 
-3. Chatbot
+2. Chat - Done
+3. Chatbot - Done
 
 To Do:
 
