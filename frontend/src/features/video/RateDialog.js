@@ -49,7 +49,7 @@ const addPitchFeedback = async (remark, account) => {
     return response;
 }
 
-let FeedbackTab = ({ profile }) => {
+let FeedbackTab = ({ profile, handleDone }) => {
     const [remark, setRemark] = useState("");
 
     const handleChangeValue = (e) => {
@@ -62,6 +62,7 @@ let FeedbackTab = ({ profile }) => {
         const account = profile.id;
         try {
             await addPitchFeedback(remark, account);
+            handleDone();
         } catch (error) {
 
         }
@@ -189,11 +190,16 @@ function RateDialog(props) {
         { value: 1, name: "Feedback", stringValue: "feedback" },
     ];
     const [dialogTabValue, setDialogTabValue] = useState(0);
+    const [isDone, setIsDone] = useState(false);
 
     const handleTabChange = (event, value) => {
         const option = tabOptions.find((option) => option.value === value);
         console.log(option.stringValue);
         setDialogTabValue(value);
+    }
+
+    const handleChangeIsDone = () => {
+        setIsDone(true);
     }
 
     return (
@@ -212,12 +218,12 @@ function RateDialog(props) {
                 />
                 <Box pt={2}>
                     {dialogTabValue === 0 && <RatingStepperTab profile={profile} criterias={meeting.criteria} />}
-                    {dialogTabValue === 1 && <FeedbackTab profile={profile} />}
+                    {dialogTabValue === 1 && <FeedbackTab profile={profile} handleDone={handleChangeIsDone} />}
                 </Box>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button disabled>Done</Button>
+                <Button disabled={!isDone}>Done</Button>
             </DialogActions>
         </Dialog>
     );

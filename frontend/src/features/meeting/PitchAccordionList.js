@@ -19,6 +19,7 @@ const fetchTeams = async () => {
 }
 
 export async function pitchLoader({ request, params }) {
+    localStorage.setItem("meetingTabValue", 0)
     try {
         const teamsResponse = await fetchTeams();
         

@@ -26,6 +26,11 @@ const addComment = async (comment, account, team, allTeam = false) => {
     return response;
 }
 
+export async function commentLoader() {
+    localStorage.setItem("meetingTabValue", 2);
+    return { ok: true};
+} 
+
 function CommentCard () {
     const { profile, meeting } = useOutletContext();
     const scrollableBoxRef = useRef(null);
@@ -71,7 +76,7 @@ function CommentCard () {
         }
       }, [reScroll]);
 
-    const handleSearchChange = (e) => {
+    const handleCommentChange = (e) => {
         const { value } = e.target;
 
         setComment(value);
@@ -117,27 +122,27 @@ function CommentCard () {
                         },
                     }}
                 >
-                    <Stack spacing={1}>
+                    <Stack spacing={2}>
                         { comments.map((comment) => (
                             <Paper key={comment.id} sx={{ backgroundColor: "black", width: "fit-content", p: 1, marginLeft: profile.full_name === comment.account_detail.full_name ? "auto !important" : "" }}>
-                                    <Stack direction="row" spacing={1}>
-                                        <img 
-                                            src="/sample/default_avatar.png"
-                                            alt="AccountProfile"
-                                            style={{ width: "20px", height: "20px", marginRight: "5px", borderRadius: "5px" }}
-                                        />
-                                        <Stack spacing={0}>
-                                            <Typography variant="body1" fontSize={14} color="grey">{comment.account_detail.full_name}</Typography>
-                                            <Typography variant="body1" fontSize={14}>{comment.comment}</Typography>
-                                        </Stack>
+                                <Stack direction="row" spacing={1}>
+                                    <img 
+                                        src="/sample/default_avatar.png"
+                                        alt="AccountProfile"
+                                        style={{ width: "20px", height: "20px", marginRight: "5px", borderRadius: "5px" }}
+                                    />
+                                    <Stack spacing={0}>
+                                        <Typography variant="body1" fontSize={14} color="grey">{comment.account_detail.full_name}</Typography>
+                                        <Typography variant="body1" fontSize={14}>{comment.comment}</Typography>
                                     </Stack>
+                                </Stack>
                             </Paper>
                         )) }
                     </Stack>
                 </Box>
                 <Paper sx={{ position: "absolute", bottom: 0, left: 0, width: "100%", p: 2}}>
                     <Stack direction="row" spacing={1}>
-                        <TextField value={comment} onChange={handleSearchChange} fullWidth size="small" label="Write a comment..." />
+                        <TextField value={comment} onChange={handleCommentChange} fullWidth size="small" label="Write a comment..." />
                         <Button onClick={handleSubmit} size="small" variant="contained">Send</Button>
                     </Stack>
                 </Paper>

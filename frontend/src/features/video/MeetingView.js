@@ -8,6 +8,7 @@ import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import ParticipantPanel from "./ParticipantPanel";
 import RatePanel from "./RatePanel";
 import RateDialog from "./RateDialog";
+import ChatPanel from "./ChatPanel";
 
 function MeetingView(props) {
     const { meeting } = props;
@@ -93,10 +94,22 @@ function MeetingView(props) {
     }
 
     const handleToggleVideoChat = () => {
-        handleToggleCollapse();
-        setOnRate(false);
-        setOnParticipant(false);
-        setOnVideoChat(!onVideoChat);
+        if (collapse && onVideoChat) {
+            setCollapse(false)
+        } else {
+            setCollapse(true)
+        }
+        if (onVideoChat) {
+            setTimeout(() => {
+                setOnRate(false);
+                setOnParticipant(false);
+                setOnVideoChat(!onVideoChat);
+            }, 800)
+        } else {
+            setOnRate(false);
+            setOnParticipant(false);
+            setOnVideoChat(!onVideoChat);
+        }
     }
 
     const handleDialogClose = () => {
@@ -124,6 +137,8 @@ function MeetingView(props) {
                 <Collapse in={collapse} orientation="horizontal" >
                     {onParticipant && <ParticipantPanel course={ getCourse } participants={[...participants.keys()]}/>}
                     {onRate && <RatePanel meeting={meeting} handleOpen={handleDialogOpen} />}
+                    {onVideoChat && <ChatPanel meeting={meeting} />}
+                    {(!onParticipant && !onRate && !onVideoChat) && <Box />}
                     {/* <Outlet context={{ participants: [...participants.keys()], course: getCourse, meeting: meeting }} /> */}
                 </Collapse>
             </Stack>

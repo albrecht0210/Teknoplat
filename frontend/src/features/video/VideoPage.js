@@ -18,20 +18,42 @@ const fetchMeeting = async () => {
     return response;
 }
 
+const fetchTeams = async () => {
+    const access = Cookies.get("access");
+    const courseId = localStorage.getItem("course");
+    const response = await axios.get(`http://localhost:8080/api/teams/?course=${courseId}`, {
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
+
 export async function videoLoader({ request, params }) {
     try {
         const meetingResponse = await fetchMeeting();
+        const teamsResponse = await fetchTeams();
 
         localStorage.setItem("videoId", meetingResponse.data.video);
-        return meetingResponse.data;
+        
+        const modifiedPitchesData = meetingResponse.data.presentors.map((pitch) => ({ ...pitch, team: teamsResponse.data.find((team) => team.id === pitch.team) }))
+        const modifiendMeeting = { ...meetingResponse.data, presentors: modifiedPitchesData };
+
+        return modifiendMeeting;
     } catch (error) {
         if (error.response && error.response.status === 401) {
             try {
                 await refreshAccessToken();
                 const meetingResponse = await fetchMeeting();
+                const teamsResponse = await fetchTeams();
 
                 localStorage.setItem("videoId", meetingResponse.data.video);
-                return meetingResponse.data;
+        
+                const modifiedPitchesData = meetingResponse.data.presentors.map((pitch) => ({ ...pitch, team: teamsResponse.data.find((team) => team.id === pitch.team) }))
+                const modifiendMeeting = { ...meetingResponse.data, presentors: modifiedPitchesData };
+
+                return modifiendMeeting;
             } catch (refreshError) {
                 Cookies.remove("access");
                 Cookies.remove("refresh");

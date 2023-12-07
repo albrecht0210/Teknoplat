@@ -7,6 +7,7 @@ import { refreshAccessToken } from "../../services/services";
 import TabContainer from "../../components/tab/TabContainer";
 import { useState } from "react";
 import CourseMemberList from "./CourseMemberList";
+import HistoryDialog from "./HistoryDialog";
 
 const fetchMeeting = async () => {
     const access = Cookies.get("access");
@@ -16,6 +17,41 @@ const fetchMeeting = async () => {
             Authorization: `Bearer ${access}`
         }
     });
+
+    return response;
+}
+
+const updateMeeting = async (meeting, videoID) => {
+    const access = Cookies.get("access");
+    const data = {
+        ...meeting,
+        status: "in_progress",
+        video: videoID.meetingId
+    }
+
+    const response = await axios.put(`http://localhost:8008/api/meetings/${meeting.id}/`, data, {
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
+
+const createVideoID = async () => {
+    const token = Cookies.get("video");
+    const access = Cookies.get("access");
+    
+    const response = await axios.post(`http://localhost:8008/api/video/create-meeting/`, 
+        {
+            token: token
+        }, 
+        { 
+            headers: {
+                Authorization: `Bearer ${access}`
+            }
+        }
+    );
 
     return response;
 }
@@ -39,20 +75,63 @@ const validateVideoID = async () => {
     return response;
 }
 
+const fetchOverallRatings = async () => {
+    const access = Cookies.get("access");
+    const meetingId = localStorage.getItem("meeting");
+    
+    const response = await axios.get(`http://localhost:8008/api/meeting/ratings/?meeting=${meetingId}`, { 
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
+
+const fetchFeedbacks = async () => {
+    const access = Cookies.get("access");
+    const meetingId = localStorage.getItem("meeting");
+    
+    const response = await axios.get(`http://localhost:8008/api/feedbacks/?meeting=${meetingId}`, { 
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
+
 export async function meetingLoader({ request, params }) {
     try {
         const meetingResponse = await fetchMeeting();
+        let pitchesRatingResponse = { data: [] };
+        let feedbacksResponse = { data: [] };
 
+        if (meetingResponse.data.status === "completed") {
+            pitchesRatingResponse = await fetchOverallRatings();
+            feedbacksResponse = await fetchFeedbacks();
+        }
+        
         localStorage.setItem("videoId", meetingResponse.data.video);
-        return meetingResponse.data;
+        return { 
+            'meeting': meetingResponse.data,
+            'feedbacks': feedbacksResponse.data,
+            'pitches': pitchesRatingResponse.data 
+        };
     } catch (error) {
         if (error.response && error.response.status === 401) {
             try {
                 await refreshAccessToken();
                 const meetingResponse = await fetchMeeting();
-
+                const pitchesRatingResponse = await fetchOverallRatings();
+                const feedbacksResponse = await fetchFeedbacks();
+                
                 localStorage.setItem("videoId", meetingResponse.data.video);
-                return meetingResponse.data;
+                return { 
+                    'meeting': meetingResponse.data,
+                    'feedbacks': feedbacksResponse.data,
+                    'pitches': pitchesRatingResponse.data
+                };
             } catch (refreshError) {
                 Cookies.remove("access");
                 Cookies.remove("refresh");
@@ -79,13 +158,25 @@ export async function meetingAction({ request, params }) {
     }
 
     if (intent === "start") {
-
+        try {
+            const meetingResponse = await fetchMeeting();
+            const videoResponse = await createVideoID();
+            await updateMeeting(meetingResponse.data, videoResponse.data);
+            await validateVideoID();
+            return redirect(`/live/${params.meetingName}`);
+        } catch (error) {
+            console.log(error.response.data);
+            return error.response.data;
+        }
     }
 
 }
 
 function MeetingPage() {
-    const meeting = useLoaderData();
+    const { meeting, pitches, feedbacks } = useLoaderData();
+    console.log(meeting);
+    console.log(pitches);
+    console.log(feedbacks);
     const { profile } = useOutletContext();
 
     const navigate = useNavigate();
@@ -93,7 +184,14 @@ function MeetingPage() {
     const currentUrl = location.pathname;
     const urlPath = currentUrl.split("meetings/");
     const meetingPath = urlPath[1].split("/");
+
+    const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
+
     let actionButton;
+
+    const handleHistoryView = async () => {
+        setOpenHistoryDialog(true);
+    }
 
     if (meeting.status === "in_progress") {
         actionButton = (
@@ -105,10 +203,14 @@ function MeetingPage() {
         if (profile?.role === "Student") {
             actionButton = <Button variant="contained" disabled>Start</Button>;
         } else {
-            actionButton = <Button variant="contained">Start</Button>;
+            actionButton = (
+                <Form method="post">
+                    <Button type="submit" name="intent" value="start" variant="contained">Join</Button>
+                </Form>
+            );
         }
     } else if (meeting.status === "completed") {
-        actionButton = <Button variant="contained">View</Button>;
+        actionButton = <Button variant="contained" onClick={handleHistoryView}>View</Button>;
     }
 
     const tabOptions = [
@@ -127,6 +229,10 @@ function MeetingPage() {
         const url = `${urlPath[0]}meetings/${meetingPath[0]}/${option.stringValue}`;
         console.log(url);
         navigate(url);
+    }
+
+    const handleHistoryDialogClose = () => {
+        setOpenHistoryDialog(false);
     }
 
     return (
@@ -154,6 +260,13 @@ function MeetingPage() {
                     <CourseMemberList />
                 </Grid>
             </Grid>
+            <HistoryDialog 
+                open={openHistoryDialog} 
+                handleClose={handleHistoryDialogClose}
+                meeting={meeting}
+                pitches={pitches}
+                feedbacks={feedbacks}
+            />
         </Box>
     );
 }

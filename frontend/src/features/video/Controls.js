@@ -5,6 +5,7 @@ import { useState } from "react";
 import { CallEnd, EditNote, Mic, MicOff, PeopleAlt, ScreenShare, StopScreenShare, VideoChat, Videocam, VideocamOff } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import axios from "axios";
+import OpenAI from 'openai';
 
 const updateMeetingStatusToCompleted = async (meeting) => {
     const access = Cookies.get("access");
@@ -13,7 +14,7 @@ const updateMeetingStatusToCompleted = async (meeting) => {
         status: "completed"
     }
 
-    const response = await axios.put(`http://localhost:8008/api/meetings/${[meeting.id]}/`, data, {
+    const response = await axios.put(`http://localhost:8008/api/meetings/${meeting.id}/`, data, {
         headers: {
             Authorization: `Bearer ${access}`
         }
@@ -22,10 +23,44 @@ const updateMeetingStatusToCompleted = async (meeting) => {
     return response;
 }
 
-const getPitchRemarks = async (pitch) => {
+const getPitchRemarks = async (meeting) => {
     const access = Cookies.get("access");
 
-    const response = await axios.get(`http://localhost:8008/api/meetings/${[pitch.id]}/`, {
+    const response = await axios.get(`http://localhost:8008/api/meetings/remarks/?meeting=${meeting.id}`, {
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
+
+const addFeedbackSummary = async (remarks) => {
+    let prompt = "Please provide a concise summary of the remarks. Highlight key strengths and areas for improvement mentioned by each evaluator. Provide it into a single paragraph.";
+
+    remarks.forEach(remark => {
+        prompt.concat(`\n\n${remark.remark}`);
+    });
+
+    const openai = new OpenAI({
+        apiKey: "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", // defaults to process.env["OPENAI_API_KEY"]
+    });
+
+    const completion = await openai.completions.create({
+        model: "gpt-3.5-turbo-instruct",
+        prompt: prompt
+    });
+
+    const summary = completion.choices[0].text;
+
+    const access = Cookies.get("access");
+    const data = {
+        pitch: remarks[0].pitch,
+        meeting: remarks[0].meeting,
+        feedback: summary
+    }
+
+    const response = await axios.post(`http://localhost:8008/api/feedbacks/`, data, {
         headers: {
             Authorization: `Bearer ${access}`
         }
@@ -71,14 +106,18 @@ function Controls(props) {
         toggleScreenShare();
     }
 
-    const handleEnd = () => {
+    const handleEnd = async () => {
+        // await updateMeetingStatusToCompleted(meeting);
+        // const remarksResponse = await getPitchRemarks(meeting);
+        // await addFeedbackSummary(remarksResponse.data);
         end();
-        // updateMeetingStatusToCompleted(meeting);
+        localStorage.removeItem("meeting_chats");
         navigate("/");
     }
     
     const handleLeave = () => {
         leave();
+        localStorage.removeItem("meeting_chats");
         navigate("/");
     }
 
@@ -89,7 +128,7 @@ function Controls(props) {
                 <Stack direction="row" spacing={2}>
                     { profile.role === "Teacher" && (
                         <>
-                            <Tooltip title="Screen Share">
+                            {/* <Tooltip title="Screen Share">
                                 <IconButton 
                                     aria-label="toggleShareScreen" 
                                     onClick={handleToggleShareScreen}
@@ -109,7 +148,7 @@ function Controls(props) {
                                 >
                                     {localScreenShareOn ? <ScreenShare /> : <StopScreenShare />}
                                 </IconButton>
-                            </Tooltip>
+                            </Tooltip> */}
                             {/* <Tooltip title={onMic ? "Off Mic" : "On Mic"}> */}
                             <Tooltip title="Mic">
                                 <IconButton 

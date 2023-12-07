@@ -6,7 +6,8 @@ import { useOutletContext } from "react-router-dom";
 
 let ParticipantButton = ({ member, meeting, isParticipantStudent = false, isAccountStudent = false }) => {
     console.log(member.id);
-    const { enableWebcam: remoteEnableWebcam, disableWebcam: remoteDisableWebcam, enableMic, disableMic, webcamOn, micOn } = useParticipant(member.id);
+    const { enableWebcam: remoteEnableWebcam, disableWebcam: remoteDisableWebcam, enableMic, disableMic: remoteDisableMic, webcamOn, micOn } = useParticipant(member.id);
+    const { disableWebcam: lastRemoteDisableWebcam, disableMic: lastRemoteDisableMic } = useParticipant(localStorage.getItem("previousParticipant"));
     const { enableWebcam: localEnableWebcam, disableWebcam: localDisableWebcam, unmuteMic, muteMic } = useMeeting({
         onWebcamRequested: ({ accept, reject, participantId }) => {
             // callback function to accept the request
@@ -18,23 +19,53 @@ let ParticipantButton = ({ member, meeting, isParticipantStudent = false, isAcco
         },
     });
     
-    const handleToggleParticipantWebCam = () => {
+    function handleToggleParticipantWebCam() {
         if (webcamOn) {
+            remoteDisableMic();
             remoteDisableWebcam();
-            localEnableWebcam();
+            setTimeout(() => {
+                localEnableWebcam();
+                unmuteMic();
+            }, 500);
         } else {
             localDisableWebcam();
-            remoteEnableWebcam();
+            muteMic();
+            if (localStorage.getItem("previousParticipant")) {
+                lastRemoteDisableWebcam();
+                lastRemoteDisableMic();
+                localStorage.setItem("previousParticipant", member.id)
+            } else {
+                localStorage.setItem("previousParticipant", member.id)
+            }
+            setTimeout(() => {
+                enableMic();
+                remoteEnableWebcam();
+            }, 500);
         }
     }
 
     const handleToggleParticipantMic = () => {
         if (micOn) {
-            disableMic();
-            unmuteMic();
+            remoteDisableMic();
+            remoteDisableWebcam();
+            setTimeout(() => {
+                localEnableWebcam();
+                unmuteMic();
+            }, 500);
         } else {
+            localDisableWebcam();
             muteMic();
-            enableMic();
+            if (localStorage.getItem("previousParticipant")) {
+                lastRemoteDisableWebcam();
+                lastRemoteDisableMic();
+                localStorage.setItem("previousParticipant", member.id)
+            } else {
+                localStorage.setItem("previousParticipant", member.id)
+            }
+            setTimeout(() => {
+                enableMic();
+                remoteEnableWebcam();
+            }, 500);
         }
     }
 

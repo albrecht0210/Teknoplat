@@ -7,8 +7,14 @@ import CoursesList from "./CoursesList";
 import { useState } from "react";
 
 let SidebarOptions = ({ open, handleCoursesClick }) => {
+    const navigate = useNavigate();
+
     const handleDashboardClick = () => {
-        redirect("/");
+        navigate("/");
+    }
+
+    const handleValidationClick = () => {
+        navigate("chatbot/");
     }
 
     return (
@@ -35,6 +41,11 @@ let SidebarOptions = ({ open, handleCoursesClick }) => {
                 <ListSubheader component="div">
                     Application
                 </ListSubheader>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={handleValidationClick}>
+                        <ListItemText primary="Idea Validation" />
+                    </ListItemButton>
+                </ListItem>
                 <ListItem disablePadding>
                     <ListItemButton>
                         <ListItemText primary="Settings" />

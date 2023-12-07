@@ -5,11 +5,13 @@ import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react'
 import { useOutletContext } from 'react-router-dom';
 import { formatStringToUrl } from '../../utils/helper';
+import finalPropsSelectorFactory from 'react-redux/es/connect/selectorFactory';
 
 const updateOpenPitchRate = async (pitch) => {
     const access = Cookies.get("access");
     const data = {
         ...pitch,
+        team: pitch.team.id,
         open_rate: true
     }
 
@@ -23,7 +25,9 @@ const updateOpenPitchRate = async (pitch) => {
 }
 
 
-let PresentorCard = ({ socket, pitch, isStudent, handleOpen }) => {
+let PresentorCard = ({ socket, pitch, isMember=false, isStudent, handleOpen }) => {
+    // const account = pitch.team.members.find((account) => account.id === profile.id)
+    // console.log(profile);
     const handleOpenRateClick = async (pitch) => {
         try {
             await updateOpenPitchRate(pitch);
@@ -44,10 +48,11 @@ let PresentorCard = ({ socket, pitch, isStudent, handleOpen }) => {
         <Paper elevation={4} sx={{ p: 1, pl: 2 }} >
             <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Typography>{pitch.name}</Typography>
-                { isStudent && !pitch.open_rate && <Button disabled>Rate</Button> }
-                { isStudent && pitch.open_rate && <Button onClick={() => handleRateClick(pitch)}>Rate</Button> }
-                { !isStudent && pitch.open_rate && <Button onClick={() => handleRateClick(pitch)}>Rate</Button> }
-                { !isStudent && !pitch.open_rate && <Button onClick={() => handleOpenRateClick(pitch)}>Open</Button> }
+                { isMember && <Button disabled>Rate</Button> }
+                { (isStudent && !pitch.open_rate && !isMember) && <Button disabled>Rate</Button> }
+                { (isStudent && pitch.open_rate && !isMember) && <Button onClick={() => handleRateClick(pitch)}>Rate</Button> }
+                { (!isStudent && pitch.open_rate && !isMember) && <Button onClick={() => handleRateClick(pitch)}>Rate</Button> }
+                { (!isStudent && !pitch.open_rate && !isMember) && <Button onClick={() => handleOpenRateClick(pitch)}>Open</Button> }
             </Stack>
         </Paper>
     );
@@ -88,12 +93,16 @@ function RatePanel(props) {
             ws.close();
         };
     }, [meeting]);
+
     console.log(pitches);
+    const isMember = pitches.find((presentor) => presentor.team.members.find((account) => account.id === profile.id));
+    console.log(isMember);
+
     return (
         <Paper sx={{ p: 2, height: "calc(100vh - 72px - 48px - 24px)", width: "calc(100vw * 0.25)" }}>
             <Stack spacing={1}>
                 {pitches.map((presentor) => (
-                    <PresentorCard key={presentor.id} socket={socket} pitch={presentor} isStudent={profile.role === "Student"} handleOpen={handleOpen} />
+                    <PresentorCard key={presentor.id} socket={socket} isMember={presentor.team.members.find((account) => account.id === profile.id) ? true : false} pitch={presentor} isStudent={profile.role === "Student"} handleOpen={handleOpen} />
                 ))}
             </Stack>
         </Paper>

@@ -3,6 +3,12 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Skeleton, Stack, Ty
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
+export async function criteriaLoader() {
+    localStorage.setItem("meetingTabValue", 1);
+
+    return { ok: true};
+} 
+
 let CriteriaAccordion = ({ criteria }) => {
     return (
         <Accordion>

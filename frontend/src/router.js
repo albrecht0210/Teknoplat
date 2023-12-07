@@ -20,10 +20,11 @@ import CourseLayout, { courseLoader } from "./layouts_prototype/CourseLayout";
 import MeetingTable, { meetingsLoader } from "./features/course/MeetingTable";
 import MeetingPage, { meetingAction, meetingLoader } from "./features/meeting/MeetingPage";
 import PitchAccordionList, { pitchLoader } from "./features/meeting/PitchAccordionList";
-import CriteriaAccordionList from "./features/meeting/CriteriaAccordionList";
-import CommentCard from "./features/meeting/CommentCard";
+import CriteriaAccordionList, { criteriaLoader } from "./features/meeting/CriteriaAccordionList";
+import CommentCard, { commentLoader } from "./features/meeting/CommentCard";
 import VideoPage, { videoLoader } from "./features/video/VideoPage";
 import ParticipantPanel from "./features/video/ParticipantPanel";
+import ValidationPage from "./features/chatbot/ValidationPage";
 // import MeetingLayout from "./layouts/MeetingLayout";
 // import MeetingPage from "./features/meeting/MeetingPage";
 // import VideoLayout from "./layouts/VideoLayout";
@@ -44,10 +45,11 @@ function UrlPaths() {
                         <Route path=":meetingName" element={<MeetingPage />} loader={meetingLoader} action={meetingAction}>
                             <Route index element={<PitchAccordionList />} loader={pitchLoader} />
                             <Route path="pitch" element={<PitchAccordionList />} loader={pitchLoader} />
-                            <Route path="criteria" element={<CriteriaAccordionList />} />
-                            <Route path="comments" element={<CommentCard />} />
+                            <Route path="criteria" element={<CriteriaAccordionList />} loader={criteriaLoader} />
+                            <Route path="comments" element={<CommentCard />} loader={commentLoader} />
                         </Route>
                     </Route>
+                    <Route path="chatbot/" element={<ValidationPage />} />
                 </Route>
                 <Route path="live/:meetingName/" element={<VideoPage />} loader={videoLoader} >
                     <Route path="participants" element={<ParticipantPanel />} />
