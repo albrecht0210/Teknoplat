@@ -107,9 +107,9 @@ function Controls(props) {
     }
 
     const handleEnd = async () => {
-        // await updateMeetingStatusToCompleted(meeting);
-        // const remarksResponse = await getPitchRemarks(meeting);
-        // await addFeedbackSummary(remarksResponse.data);
+        const remarksResponse = await getPitchRemarks(meeting);
+        await addFeedbackSummary(remarksResponse.data);
+        await updateMeetingStatusToCompleted(meeting);
         end();
         localStorage.removeItem("meeting_chats");
         navigate("/");
