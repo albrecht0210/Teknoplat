@@ -13,7 +13,6 @@ function SearchInput(props) {
             onChange={handleChange}
             autoComplete="off"
             variant="outlined"
-            sx={{ ml: "auto" }}
             size="small"
         />
     );
