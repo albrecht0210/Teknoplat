@@ -11,6 +11,11 @@ import {
     Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { useOutletContext } from "react-router-dom";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import Cookies from "js-cookie";
+import axios from "axios";
 
 ChartJS.register(
     CategoryScale,
@@ -20,6 +25,18 @@ ChartJS.register(
     Tooltip,
     Legend
 );
+
+const getPitchRemarks = async (meeting) => {
+    const access = Cookies.get("access");
+
+    const response = await axios.get(`http://localhost:8008/api/meeting/remarks/?meeting=${meeting.id}`, {
+        headers: {
+            Authorization: `Bearer ${access}`
+        }
+    });
+
+    return response;
+}
 
 let OverallView = ({ pitches }) => {
     const options = {
@@ -60,7 +77,7 @@ let OverallView = ({ pitches }) => {
     );
 }
 
-let PitchView = ({ pitch, feedback }) => {
+let PitchView = ({ profile, pitch, feedback }) => {
     const options = {
         responsive: true,
         plugins: {
@@ -74,14 +91,20 @@ let PitchView = ({ pitch, feedback }) => {
         },
     };
 
-    const labels = pitch.ratings.map((rating) => rating.account.full_name);
-    console.log(feedback);
+    const initLabels = pitch.ratings.map((rating) => rating.account.full_name);
+    let labels;
+
+    if (profile.role === "Student") {
+        labels = pitch.ratings.map((rating) => rating.account.role === "Teacher" || rating.account.full_name === profile.full_name ? rating.account.full_name : "Anonymous");
+    } else {
+        labels = initLabels
+    }
     const data = {
         labels,
         datasets: [
             {
                 label: "Score",
-                data: labels.map((label) => pitch.ratings.find((rating) => rating.account.full_name === label).total),
+                data: initLabels.map((label) => pitch.ratings.find((rating) => rating.account.full_name === label).total),
                 backgroundColor: 'rgba(255, 99, 132, 0.5)'
             }
         ]
@@ -100,6 +123,8 @@ let PitchView = ({ pitch, feedback }) => {
 }
 
 function HistoryDialog(props) {
+    const { profile } = useOutletContext();
+
     const { open, handleClose, meeting, pitches, feedbacks } = props;
 
     const presentors = meeting.presentors;
@@ -108,19 +133,46 @@ function HistoryDialog(props) {
         { value: 0, name: "Overall" },
     ];
 
-    console.log(pitches);
     const tabPitchOptions = presentors.map((pitch, index) => { return {value: (index + 1), name: pitch.name }});
-    console.log(tabPitchOptions);
 
     tabOptions = tabOptions.concat(tabPitchOptions);
 
     const [dialogTabValue, setDialogTabValue] = useState(0);
-    console.log(tabOptions);
 
     const handleTabChange = (event, value) => {
         const option = tabOptions.find((option) => option.value === value);
         console.log(option.stringValue);
         setDialogTabValue(value);
+    }
+
+    const handleExportClick = async () => {
+        const remarksResponse = await getPitchRemarks(meeting);
+
+        const jsonData = pitches.flatMap((pitch) => {
+            return pitch.ratings.map(rating => {
+                const transformedData = {
+                    "Pitch Name": pitch.name,
+                    "Account": rating.account.full_name,
+                };
+        
+                rating.criteria.forEach(criteria => {
+                    transformedData[criteria.name] = criteria.value;
+                });
+                transformedData['Remark'] = remarksResponse.data.find((remark) => remark.account === rating.account.id).remark
+                transformedData['Feedback'] = feedbacks.find((feedback) => feedback.pitch === pitch.id)
+                return transformedData;
+            });
+        });
+        
+        const workbook = XLSX.utils.book_new();
+
+        // Convert JSON data to a worksheet
+        const worksheet = XLSX.utils.json_to_sheet(jsonData);
+
+        // Add the worksheet to the workbook
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
+
+        XLSX.writeFile(workbook, `${meeting.name}.xlsx`);
     }
 
     return (
@@ -131,7 +183,12 @@ function HistoryDialog(props) {
             onClose={handleClose}
             keepMounted={false}
         >
-            <DialogTitle>{meeting.name}</DialogTitle>
+            <DialogTitle>
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    {meeting.name}
+                    {profile.role === "Teacher" && <Button variant="contained" onClick={handleExportClick}>Export</Button>}
+                </Stack>
+            </DialogTitle>
             <DialogContent dividers>
                 <TabContainer 
                     tabOptions={tabOptions}
@@ -139,7 +196,7 @@ function HistoryDialog(props) {
                     selected={dialogTabValue}
                 />
                 {dialogTabValue === 0 && <OverallView pitches={pitches} />}
-                {dialogTabValue !== 0 && <PitchView pitch={pitches[dialogTabValue - 1]} feedback={feedbacks.find((feedback) => feedback.pitch === pitches[dialogTabValue - 1].id)} />}
+                {dialogTabValue !== 0 && <PitchView profile={profile} pitch={pitches[dialogTabValue - 1]} feedback={feedbacks.find((feedback) => feedback.pitch === pitches[dialogTabValue - 1].id)} />}
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>

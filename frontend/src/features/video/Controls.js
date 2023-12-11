@@ -1,4 +1,4 @@
-import { Box, Button, Divider, IconButton, Paper, Stack, Tooltip } from "@mui/material";
+import { Box, Button, Dialog, DialogContent, DialogTitle, Divider, IconButton, Paper, Stack, Tooltip } from "@mui/material";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useState } from "react";
@@ -26,7 +26,7 @@ const updateMeetingStatusToCompleted = async (meeting) => {
 const getPitchRemarks = async (meeting) => {
     const access = Cookies.get("access");
 
-    const response = await axios.get(`http://localhost:8008/api/meetings/remarks/?meeting=${meeting.id}`, {
+    const response = await axios.get(`http://localhost:8008/api/meeting/remarks/?meeting=${meeting.id}`, {
         headers: {
             Authorization: `Bearer ${access}`
         }
@@ -72,9 +72,14 @@ const addFeedbackSummary = async (remarks) => {
 function Controls(props) {
     const { meeting, rate, participant, chat } = props;
     const { profile } = useOutletContext();
-
-    console.log(profile);
+    
     const navigate = useNavigate();
+
+    const [openDialog, setOpenDialog] = useState(false);
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    }
 
     const onMeetingLeft = () => {
         navigate("/")
@@ -106,6 +111,10 @@ function Controls(props) {
         toggleScreenShare();
     }
 
+    const handleEndIcon = () => {
+        setOpenDialog(true);
+    }
+    
     const handleEnd = async () => {
         const remarksResponse = await getPitchRemarks(meeting);
         await addFeedbackSummary(remarksResponse.data);
@@ -114,7 +123,7 @@ function Controls(props) {
         localStorage.removeItem("meeting_chats");
         navigate("/");
     }
-    
+
     const handleLeave = () => {
         leave();
         localStorage.removeItem("meeting_chats");
@@ -195,7 +204,7 @@ function Controls(props) {
                             </Tooltip>
                             <Tooltip title="End Call">
                                 <IconButton 
-                                    onClick={handleEnd} 
+                                    onClick={handleEndIcon} 
                                     aria-label="endCall" 
                                     sx={{ 
                                         backgroundColor: "#ff4313", 
@@ -292,6 +301,15 @@ function Controls(props) {
                     </IconButton>
                 )}
             </Stack> */}
+            <Dialog open={openDialog} onClose={handleCloseDialog}>
+                <DialogTitle>Leaving or Ending call?</DialogTitle>
+                <DialogContent>
+                    <Stack direction="row" spacing={3}>
+                        <Button variant="outlined" color="error" onClick={handleLeave}>Leave Call</Button> 
+                        <Button variant="contained" color="error" onClick={handleEnd}>End Call</Button> 
+                    </Stack>
+                </DialogContent>
+            </Dialog>
         </Paper>
     );
 }

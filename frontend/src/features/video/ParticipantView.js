@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
@@ -50,24 +50,31 @@ function ParticipantView(props) {
             </p> */}
             <audio ref={micRef} autoPlay playsInline muted={isLocal} />
             {webcamOn ? (
-              <ReactPlayer
+              <Box sx={{ position: "relative", backgroundRepeat: "no-repeat", backgroundSize: "cover", backgroundPosition: "center center" }}>
+                <ReactPlayer
 
-                //
-                playsinline // very very imp prop
-                pip={false}
-                light={false}
-                controls={false}
-                muted={true}
-                playing={true}
-                //
-                url={videoStream}
-                //
-                height={"calc(100vh - 72px - 48px - 24px)"}
-                width={"-webkit-fill-available"}
-                onError={(err) => {
-                  console.log(err, "participant video error");
-                }}
-              />
+                  //
+                  playsinline // very very imp prop
+                  pip={false}
+                  light={false}
+                  controls={false}
+                  muted={true}
+                  playing={true}
+                  //
+                  url={videoStream}
+                  //
+                  height={"calc(100vh - 72px - 48px - 24px)"}
+                  width={"-webkit-fill-available"}
+                  onError={(err) => {
+                    console.log(err, "participant video error");
+                  }}
+                />
+                <Box sx={{ position: "absolute", top: 0, bottom: 0, right: 0, left: 0, width: "100%", height: "100%", backgroundAttachment: "fixed" }}>
+                  <Box sx={{ backgroundColor: "#000000a8", position: "absolute", bottom: 0, p: 1 }}>
+                    <Typography variant="button" fontSize={12}>{displayName}</Typography>
+                  </Box>
+                </Box>
+              </Box>
             ) : (
               <Box sx={{ display: "flex", justifyContent:"center", alignItems:"center", width: "100%"}}>
                   {/* <PersonIcon /> */}
