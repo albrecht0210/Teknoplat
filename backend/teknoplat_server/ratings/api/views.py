@@ -60,11 +60,11 @@ class MeetingRatingOverallAPIView(views.APIView):
                 totalScore = 0
                 overall = 0
                 data = []
-
+                criteria = []
                 for rating in ratings:
                     meeting_criteria = MeetingCriteria.objects.get(meeting=meeting_param, criteria=rating.criteria)
                     if currentAccount != rating.account:
-                        data.append({ 'account': account, 'total': totalScore })
+                        data.append({ 'account': account, 'criteria': criteria, 'total': totalScore })
                         if account['role'] == 'Teacher':
                             overall += totalScore * meeting.teacher_weight_score
                         else:
@@ -72,10 +72,11 @@ class MeetingRatingOverallAPIView(views.APIView):
                         totalScore = 0
                         currentAccount = rating.account
                         account = AccountSerializer(currentAccount).data
-                        
+                        criteria = []
+                    criteria.append({ 'name': rating.criteria.name, 'value': rating.rating })
                     totalScore += rating.rating * meeting_criteria.weight
 
-                data.append({ 'account': account, 'total': totalScore })
+                data.append({ 'account': account, 'criteria': criteria, 'total': totalScore })
                 pitch_data['ratings'] = data
                 pitch_data['overall'] = overall
                 response_data.append(pitch_data)
