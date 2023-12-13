@@ -28,13 +28,13 @@ const updateMeeting = async (meeting, videoID) => {
         status: "in_progress",
         video: videoID.meetingId
     }
+    localStorage.setItem("videoId", videoID.meetingId);
 
     const response = await axios.put(`http://localhost:8008/api/meetings/${meeting.id}/`, data, {
         headers: {
             Authorization: `Bearer ${access}`
         }
     });
-
     return response;
 }
 
@@ -60,7 +60,7 @@ const validateVideoID = async () => {
     const token = Cookies.get("video");
     const access = Cookies.get("access");
     const videoId = localStorage.getItem("videoId");
-    
+    console.log(videoId);
     const response = await axios.post(`http://localhost:8008/api/video/validate-meeting/${videoId}/`, 
         {
             token: token
@@ -205,7 +205,7 @@ function MeetingPage() {
         } else {
             actionButton = (
                 <Form method="post">
-                    <Button type="submit" name="intent" value="start" variant="contained">Join</Button>
+                    <Button type="submit" name="intent" value="start" variant="contained">Start</Button>
                 </Form>
             );
         }

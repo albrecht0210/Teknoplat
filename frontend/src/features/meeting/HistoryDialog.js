@@ -199,8 +199,7 @@ function HistoryDialog(props) {
                 {dialogTabValue !== 0 && <PitchView profile={profile} pitch={pitches[dialogTabValue - 1]} feedback={feedbacks.find((feedback) => feedback.pitch === pitches[dialogTabValue - 1].id)} />}
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button disabled>Done</Button>
+                <Button onClick={handleClose}>Done</Button>
             </DialogActions>
         </Dialog>
     );
