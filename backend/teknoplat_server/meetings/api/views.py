@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from ..models import Meeting
-from .serializers import CreateMeetingSerializer, MeetingSerializer
+from .serializers import CreateMeetingSerializer, MeetingSerializer, CreatedMeetingSerializer
 from teknoplat_server.permissions import IsTeacherUserOrReadOnly
 
 from pitches.models import Pitch
@@ -202,28 +202,13 @@ class MeetingViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class MeetingPendingAPIView(viewsets.ModelViewSet):
-    pagination_class = LimitOffsetPagination
-    serializer_class = MeetingSerializer
+class MeetingRetrieveAPIView(generics.RetrieveAPIView):
+    serializer_class = CreatedMeetingSerializer
     permission_classes = (permissions.IsAuthenticated, )
 
-    def get_queryset(self):
-        queryset = Meeting.objects.filter(status="pending")
-        course_param = self.request.query_params.get('course', None)
-        
-        if course_param:
-            queryset = queryset.filter(course=course_param)
-        
-        return queryset
-
-class MeetingInProgressAPIView(generics.ListAPIView):
-    queryset = Meeting.objects.filter(status="in_progress")
-    pagination_class = LimitOffsetPagination
-    serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticated, )
-
-class MeetingCompletedAPIView(generics.ListAPIView):
-    queryset = Meeting.objects.filter(status="completed")
-    pagination_class = LimitOffsetPagination
-    serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticated, )
+    def get_object(self):
+        name_param = self.request.query_params.get("name", None)
+        if name_param:
+            meeting = Meeting.objects.get(name=name_param)
+            return meeting
+        return Meeting.objects.all()

@@ -10,6 +10,17 @@ class PitchViewSet(viewsets.ModelViewSet):
     serializer_class = PitchSerializer
     permission_classes = (permissions.IsAuthenticated, IsTeacherUserOrReadOnly, )
 
+    def get_queryset(self):
+        queryset = self.queryset
+        team_params = self.request.query_params.get('team', None)
+
+        if team_params:
+            queryset = queryset.filter(team=team_params)
+        
+        print(queryset)
+        return queryset
+        
+
     # def get_auth_headers(self):
     #     authorization_header = self.request.META.get('HTTP_AUTHORIZATION', None)
     #     _, token = authorization_header.split()

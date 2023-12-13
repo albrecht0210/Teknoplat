@@ -22,3 +22,7 @@ class MeetingSerializer(serializers.ModelSerializer):
     def get_comments(self, obj):
         return CommentSerializer(obj.comments, many=True).data
     
+class CreatedMeetingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meeting
+        fields = '__all__'
